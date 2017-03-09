@@ -1,12 +1,25 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
 var express = require('express');
+var http = require('http');
 var bodyParser = require('body-parser');
 var queryString = require('querystring');
 var request = require('request');
+
 var app = express();
+var server = http.createServer(app);
+var WebSocket = require('ws');
+var wss = new WebSocket.Server({ server: server });
+
+wss.on('connection', function (ws) {
+  console.log('connection');
+
+  ws.on('message', function (message) {
+    console.log('Receive: ' + message);
+  });
+
+  ws.send('Welcome~');
+});
 
 app.set('port', process.env.PORT || 1338);
 app.use(bodyParser.json());
@@ -28,6 +41,6 @@ app.get('/helloWorld', function (req, res) {
   res.end();
 });
 
-app.listen(app.get('port'), function () {
+server.listen(app.get('port'), function () {
   console.log('Ready on port: ' + app.get('port'));
 });

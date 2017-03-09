@@ -1,16 +1,29 @@
-'use strict';
-
-const fs = require ('fs');
-const path = require ('path');
 const express = require ('express');
+const http = require ('http');
 const bodyParser = require ('body-parser');
 const queryString = require ('querystring');
 const request = require ('request');
+
 const app = express ();
+const server = http.createServer (app);
+const WebSocket = require ('ws');
+const wss = new WebSocket.Server ({ server });
+
+wss.on ('connection', function (ws) {
+  console.log ('connection');
+  
+  ws.on ('message', function (message) {
+    console.log ('Receive: ' +  message);
+  });
+  
+  ws.send ('Welcome~');
+});
 
 app.set ('port', process.env.PORT || 1338);
 app.use (bodyParser.json ());
 app.use ('/', express.static ('public'));
+
+
 
 // Additional middleware which will set headers that we need on each request.
 app.use (function (req, res, next) {
@@ -28,6 +41,6 @@ app.get ('/helloWorld', function (req, res) {
   res.end ();
 });
 
-app.listen (app.get ('port'), function () {
+server.listen (app.get ('port'), function () {
   console.log ('Ready on port: ' + app.get ('port'));
 });
