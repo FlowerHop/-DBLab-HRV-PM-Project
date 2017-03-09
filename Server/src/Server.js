@@ -8,15 +8,30 @@ const app = express ();
 const server = http.createServer (app);
 const WebSocket = require ('ws');
 const wss = new WebSocket.Server ({ server });
+let routers = {};
+let patients = {};
 
 wss.on ('connection', function (ws) {
   console.log ('connection');
   
-  ws.on ('message', function (message) {
-    console.log ('Receive: ' +  message);
+  ws.on ('message', function (message) {  	
+  	if (message.id) {
+  	  routersWs[message.id] = ws;
+      console.log ('Receive a router: ' +  message);
+  	  ws.send ('ok');	
+  	}
+  });
+
+  ws.on ('close', function () {
+  	for (var i in routers) {
+  		if (routers[i] == ws) {
+  			ws.send ('close');
+  			delete routers[i];
+  			return;
+  		}
+  	}
   });
   
-  ws.send ('Welcome~');
 });
 
 app.set ('port', process.env.PORT || 1338);

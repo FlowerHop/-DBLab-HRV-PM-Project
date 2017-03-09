@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+</head>
+<body>
+    <p>HelloWorld!</p>
+    <script type="text/javascript">
+        window.onload = function () {
+        	var mSocket = new WebSocket("ws://140.115.51.30:1338");
+            // this.mSocket.binaryType = "arraybuffer";
+
+            mSocket.onopen = function (evt) {
+                console.log("Connection established");
+            };
+
+            mSocket.onmessage = function (evt) {
+                console.log ('Receive from Server: ' + evt.data);
+            };
+
+            mSocket.onerror = function (evt) {
+                console.log("Error: " + evt.data);
+            };
+
+            mSocket.onclose = function (evt) {
+                console.log("Connection closed");
+            }
+        }
+    </script>
+</body>
+</html>
