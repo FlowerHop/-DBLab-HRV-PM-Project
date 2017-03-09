@@ -40,6 +40,10 @@ wss.on ('connection', (ws) => {
   			}
   		}
   	});
+
+  	ws.on ('error', (error) => {
+  		throw new Error (error);
+  	});
   } catch (err) {
     console.log (err);
   }  

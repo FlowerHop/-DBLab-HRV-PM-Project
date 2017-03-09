@@ -42,6 +42,10 @@ wss.on('connection', function (ws) {
         }
       }
     });
+
+    ws.on('error', function (error) {
+      throw new Error(error);
+    });
   } catch (err) {
     console.log(err);
   }
