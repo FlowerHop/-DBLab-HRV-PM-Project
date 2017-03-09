@@ -17,17 +17,12 @@ wss.on('connection', function (ws) {
   console.log('connection');
   try {
     ws.on('message', function (message) {
-      console.log('1: ' + message);
       var pattern = /id\/(\w+)/;
       var match = message.match(pattern);
-      console.log('2: ' + match);
-      if (match == null) {
-        return;
-      }
 
-      var id = match ? match[1] : undefined;
+      var id = match ? match[1] : 'undefined';
 
-      if (id !== undefined) {
+      if (id !== 'undefined') {
         routers[id] = ws;
         console.log('Receive a router: ' + message);
         ws.send('ok');
