@@ -40,7 +40,6 @@ wss.on ('connection', (ws) => {
   		}
   	}
   });
-   
 });
 
 app.set ('port', process.env.PORT || 1338);
