@@ -15,32 +15,36 @@ var patients = {};
 
 wss.on('connection', function (ws) {
   console.log('connection');
+  try {
+    ws.on('message', function (message) {
+      var pattern = /id\/(\w+)/;
+      var match = message.match(pattern);
+      var id = match ? match[1] : undefined;
 
-  ws.on('message', function (message) {
-    var pattern = /id\/(\w+)/;
-    var match = message.match(pattern);
-    var id = match ? match[1] : undefined;
-    console.log('id status');
-    if (id) {
-      routers[id] = ws;
-      console.log('Receive a router: ' + message);
-      ws.send('ok');
+      if (id) {
+        routers[id] = ws;
+        console.log('Receive a router: ' + message);
+        ws.send('ok');
 
-      ws.on('message', function (message) {
-        console.log('Receive from ' + id + ' : ' + message);
-      });
-    }
-  });
-
-  ws.on('close', function () {
-    for (var i in routers) {
-      if (routers[i] == ws) {
-        ws.send('close');
-        delete routers[i];
-        return;
+        ws.on('message', function (message) {
+          console.log('Receive from ' + id + ' : ' + message);
+        });
       }
-    }
-  });
+    });
+
+    ws.on('close', function () {
+      for (var i in routers) {
+        if (routers[i] == ws) {
+          ws.send('close');
+          console.log(i + ' close');
+          delete routers[i];
+          return;
+        }
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.set('port', process.env.PORT || 1338);
