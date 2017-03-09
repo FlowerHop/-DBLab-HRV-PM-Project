@@ -19,7 +19,7 @@ wss.on ('connection', (ws) => {
   		var match = message.match (pattern);
   		var id = match ? match[1] : undefined;
 
-  		if (id) {
+  		if (id !== undefined) {
   		  routers[id] = ws;
   	    console.log ('Receive a router: ' +  message);
   		  ws.send ('ok');	
