@@ -32,8 +32,12 @@ wss.on('connection', function (ws) {
       ws.send('ok');
       var service = new AliveServiceManager();
       ws.on('message', function (message) {
-
-        console.log('Receive from ' + id + ' : ' + message);
+        if (message instanceof ArrayBuffer) {
+          var mBytesBuffer = new Int8Array(message);
+          for (var i = 0; i < mBytesBuffer.length; i++) {
+            service.run(mBytesBuffer[i]);
+          }
+        }
       });
     }
   });
