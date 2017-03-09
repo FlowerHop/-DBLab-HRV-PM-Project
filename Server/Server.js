@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var express = require('express');
 var http = require('http');
 var bodyParser = require('body-parser');
@@ -34,15 +32,15 @@ wss.on('connection', function (ws) {
       ws.send('ok');
       var service = new AliveServiceManager();
       ws.on('message', function (message) {
-        console.log(typeof message === 'undefined' ? 'undefined' : _typeof(message));
-        console.log(message instanceof ArrayBuffer);
-        console.log(message instanceof Buffer);
-        if (message instanceof ArrayBuffer) {
-          var mBytesBuffer = new Int8Array(message);
-          for (var i = 0; i < mBytesBuffer.length; i++) {
-            service.run(mBytesBuffer[i]);
-          }
+        // console.log (typeof message);
+        // console.log (message instanceof ArrayBuffer);
+        // console.log (message instanceof Buffer);
+        // if (message instanceof ArrayBuffer) {
+        // var mBytesBuffer = new Int8Array(message);
+        for (var i = 0; i < message.length; i++) {
+          service.run(message[i]);
         }
+        // }
       });
     }
   });

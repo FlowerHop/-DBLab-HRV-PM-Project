@@ -30,15 +30,15 @@ wss.on ('connection', (ws) => {
   	  ws.send ('ok');
       let service = new AliveServiceManager ();
   	  ws.on ('message', (message) => {
-  	  	console.log (typeof message);
-  	  	console.log (message instanceof ArrayBuffer);
-  	  	console.log (message instanceof Buffer);
-        if (message instanceof ArrayBuffer) {
-            var mBytesBuffer = new Int8Array(message);
-                for (var i = 0; i < mBytesBuffer.length; i++) {
-                    service.run(mBytesBuffer[i]);    
+  	  	// console.log (typeof message);
+  	  	// console.log (message instanceof ArrayBuffer);
+  	  	// console.log (message instanceof Buffer);
+        // if (message instanceof ArrayBuffer) {
+            // var mBytesBuffer = new Int8Array(message);
+                for (var i = 0; i < message.length; i++) {
+                    service.run(message[i]);    
                 }
-        }
+        // }
   	  });
   	} 
   });
