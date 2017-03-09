@@ -39,12 +39,12 @@ wss.on ('connection', (ws) => {
   	ws.on ('close', () => {
   		for (var i in routers) {
   			if (routers[i] == ws) {
-  				ws.send ('close', (err) => {
-                  if (err) {
-                  	console.log ('throw 3');
-                  	throw new Error (err);
-                  }
-  				});
+  				// ws.send ('close', (err) => {
+      //             if (err) {
+      //             	console.log ('throw 3');
+      //             	throw new Error (err);
+      //             }
+  				// });
   	            console.log (i + ' close');
   				delete routers[i];
   				return;
