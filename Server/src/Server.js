@@ -16,7 +16,8 @@ wss.on ('connection', (ws) => {
   
   ws.on ('message', (message) => {  	
   	var pattern = /id\/(\w+)/;
-  	var id = message.match (pattern)[1];
+  	var match = message.match (pattern);
+  	var id = match ? match[1] : undefined;
   	console.log ('id status');
   	if (id) {
   	  routers[id] = ws;
