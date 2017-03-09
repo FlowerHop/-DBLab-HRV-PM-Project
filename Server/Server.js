@@ -23,6 +23,10 @@ wss.on('connection', function (ws) {
       routers[id] = ws;
       console.log('Receive a router: ' + message);
       ws.send('ok');
+
+      ws.on('message', function (message) {
+        console.log('Receive from ' + id + ' : ' + message);
+      });
     }
   });
 

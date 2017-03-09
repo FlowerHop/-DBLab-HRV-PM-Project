@@ -7,6 +7,7 @@ var ws = new WebSocket('ws://140.115.51.30:1338', {
 });
 
 var connected = false;
+var timer = void 0;
 
 ws.on('open', function () {
   console.log('connection');
@@ -14,10 +15,12 @@ ws.on('open', function () {
 });
 
 ws.on('message', function (message) {
-  if (connected) {
-    ws.send('raw data');
-  }if (message == 'ok') {
+  if (message == 'ok') {
+    console.log('start transform');
     connected = true;
+    timer = setInterval(function () {
+      ws.send('rawData');
+    }, 1000);
   }
 });
 
