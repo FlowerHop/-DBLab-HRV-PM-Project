@@ -13,54 +13,34 @@ let patients = {};
 
 wss.on ('connection', (ws) => {
   console.log ('connection');
-  try {
-  	ws.on ('message', (message) => {  	
-  		var pattern = /id\/(\w+)/;
-  		var match = message.match (pattern);
+  
+  ws.on ('message', (message) => {  	
+  	var pattern = /id\/(\w+)/;
+  	var match = message.match (pattern);
 
-  		var id = match ? match[1] : 'undefined';
+  	var id = match ? match[1] : 'undefined';
 
-  		if (id !== 'undefined') {
-  		  routers[id] = ws;
-  	      console.log ('Receive a router: ' +  message);
-  		  ws.send ('ok', function (err) {
-  		  	if (err) {
-  		  	  console.log ('throw 1');
-              throw new Error (err);
-            }
-  		  });	
+  	if (id !== 'undefined') {
+  	  routers[id] = ws;
+        console.log ('Receive a router: ' +  message);
+  	  ws.send ('ok');
 
-  		  ws.on ('message', (message) => {
-  	       console.log ('Receive from ' + id + ' : ' + message);
-  		  });
-  		} 
-  	});
+  	  ws.on ('message', (message) => {
+         console.log ('Receive from ' + id + ' : ' + message);
+  	  });
+  	} 
+  });
 
-  	ws.on ('close', () => {
-  		for (var i in routers) {
-  			if (routers[i] == ws) {
-  				// ws.send ('close', (err) => {
-      //             if (err) {
-      //             	console.log ('throw 3');
-      //             	throw new Error (err);
-      //             }
-  				// });
-  	            console.log (i + ' close');
-  				delete routers[i];
-  				return;
-  			}
+  ws.on ('close', () => {
+  	for (var i in routers) {
+  		if (routers[i] == ws) {
+              console.log (i + ' close');
+  			delete routers[i];
+  			return;
   		}
-  	});
-
-  	ws.on ('error', (err) => {
-  		if (err) {
-  		  console.log ('throw 2');
-  		  throw new Error (err);
-  		}
-  	});
-  } catch (err) {
-    console.log (err);
-  }  
+  	}
+  });
+   
 });
 
 app.set ('port', process.env.PORT || 1338);
