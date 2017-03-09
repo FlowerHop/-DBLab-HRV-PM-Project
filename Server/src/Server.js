@@ -8,6 +8,7 @@ const app = express ();
 const server = http.createServer (app);
 const WebSocket = require ('ws');
 const wss = new WebSocket.Server ({ server });
+const AliveServiceManager = require ('./HRVlib/AliveService');
 let routers = {};
 let patients = {};
 
@@ -22,10 +23,11 @@ wss.on ('connection', (ws) => {
 
   	if (id !== 'undefined') {
   	  routers[id] = ws;
-        console.log ('Receive a router: ' +  message);
+      console.log ('Receive a router: ' +  message);
   	  ws.send ('ok');
-
+      let service = new AliveServiceManager ();
   	  ws.on ('message', (message) => {
+
          console.log ('Receive from ' + id + ' : ' + message);
   	  });
   	} 

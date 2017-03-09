@@ -1,13 +1,20 @@
 'use strict';
 
+var serialport = require('serialport');
 var WebSocket = require('ws');
+
+var port = new serial('/dev/rfcomm', { baudrate: 9600 });
 
 var ws = new WebSocket('ws://140.115.51.30:1338', {
   perMessageDeflate: false
 });
 
-var connected = false;
-var timer = void 0;
+port.on('open', function (err) {
+  if (err) {
+    console.log(err);
+    return;
+  }
+});
 
 ws.on('open', function () {
   console.log('connection');
@@ -17,10 +24,9 @@ ws.on('open', function () {
 ws.on('message', function (message) {
   if (message == 'ok') {
     console.log('start transform');
-    connected = true;
-    timer = setInterval(function () {
-      ws.send('rawData');
-    }, 1000);
+    port.on('data', function (data) {
+      ws.send(data);
+    });
   }
 });
 

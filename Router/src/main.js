@@ -1,24 +1,30 @@
+const serialport = require ('serialport');
 const WebSocket = require ('ws');
+
+let port = new serial ('/dev/rfcomm', {baudrate: 9600});
 
 const ws = new WebSocket ('ws://140.115.51.30:1338', {
   perMessageDeflate: false
 });
 
-let connected = false;
-let timer;
+port.on ('open', (err) => {
+  if (err) {
+    console.log (err);
+    return;
+  }
+}); 
 
-ws.on ('open', function () {
+ws.on ('open', () => {
   console.log ('connection');
   ws.send ('id/' + process.argv[2]);
 });
 
-ws.on ('message', function (message) {
+ws.on ('message', (message) => {
   if (message == 'ok') {
     console.log ('start transform');
-    connected = true;
-    timer = setInterval (function () {
-      ws.send ('rawData');
-    }, 1000);
+    port.on ('data', function (data) {
+      ws.send (data);
+    });
   }
 });
 
