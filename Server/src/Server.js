@@ -23,7 +23,10 @@ wss.on ('connection', (ws) => {
   		if (id !== 'undefined') {
   		  routers[id] = ws;
   	      console.log ('Receive a router: ' +  message);
-  		  ws.send ('ok');	
+  		  ws.send ('ok', function (err) {
+  		  	console.log ('throw 1');
+            throw new Error (err);
+  		  });	
 
   		  ws.on ('message', (message) => {
   	       console.log ('Receive from ' + id + ' : ' + message);
@@ -43,6 +46,7 @@ wss.on ('connection', (ws) => {
   	});
 
   	ws.on ('error', (error) => {
+  		console.log ('throw 2');
   		throw new Error (error);
   	});
   } catch (err) {
