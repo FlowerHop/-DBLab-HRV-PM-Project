@@ -1,5 +1,6 @@
 'use strict';
 let QrsDetManager = require ('./QrsDet');
+let HRV = require ('./HRV');
 
 (function () {
     var HRDetManager = function() {
