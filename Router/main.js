@@ -10,7 +10,7 @@ var connected = false;
 
 ws.on('open', function () {
   console.log('connection');
-  ws.send({ id: process.argv[2] });
+  ws.send('id/' + process.argv[2]);
 });
 
 ws.on('message', function (message) {
