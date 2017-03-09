@@ -30,6 +30,7 @@ wss.on ('connection', (ws) => {
   	  ws.send ('ok');
       let service = new AliveServiceManager ();
   	  ws.on ('message', (message) => {
+  	  	console.log (typeof message);
         if (message instanceof ArrayBuffer) {
             var mBytesBuffer = new Int8Array(message);
                 for (var i = 0; i < mBytesBuffer.length; i++) {
