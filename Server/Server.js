@@ -35,6 +35,8 @@ wss.on('connection', function (ws) {
       var service = new AliveServiceManager();
       ws.on('message', function (message) {
         console.log(typeof message === 'undefined' ? 'undefined' : _typeof(message));
+        console.log(message instanceof ArrayBuffer);
+        console.log(message instanceof Buffer);
         if (message instanceof ArrayBuffer) {
           var mBytesBuffer = new Int8Array(message);
           for (var i = 0; i < mBytesBuffer.length; i++) {
