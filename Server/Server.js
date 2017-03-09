@@ -26,8 +26,10 @@ wss.on('connection', function (ws) {
         routers[id] = ws;
         console.log('Receive a router: ' + message);
         ws.send('ok', function (err) {
-          console.log('throw 1');
-          throw new Error(err);
+          if (err) {
+            console.log('throw 1');
+            throw new Error(err);
+          }
         });
 
         ws.on('message', function (message) {
@@ -47,9 +49,11 @@ wss.on('connection', function (ws) {
       }
     });
 
-    ws.on('error', function (error) {
-      console.log('throw 2');
-      throw new Error(error);
+    ws.on('error', function (err) {
+      if (err) {
+        console.log('throw 2');
+        throw new Error(err);
+      }
     });
   } catch (err) {
     console.log(err);
