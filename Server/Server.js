@@ -18,7 +18,8 @@ wss.on('connection', function (ws) {
 
   ws.on('message', function (message) {
     var pattern = /id\/(\w+)/;
-    var id = message.match(pattern);
+    var id = message.match(pattern)[1];
+    console.log('id status');
     if (id) {
       routers[id] = ws;
       console.log('Receive a router: ' + message);
