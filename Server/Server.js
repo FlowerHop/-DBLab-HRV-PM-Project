@@ -18,6 +18,9 @@ wss.on('connection', function (ws) {
   console.log('connection');
 
   ws.on('message', function (message) {
+    if (!message.match) {
+      return;
+    }
     var pattern = /id\/(\w+)/;
     var match = message.match(pattern);
 

@@ -15,7 +15,10 @@ let patients = {};
 wss.on ('connection', (ws) => {
   console.log ('connection');
   
-  ws.on ('message', (message) => {  	
+  ws.on ('message', (message) => { 
+    if (!message.match) {
+      return;
+    } 	
   	var pattern = /id\/(\w+)/;
   	var match = message.match (pattern);
 
