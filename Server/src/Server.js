@@ -17,6 +17,11 @@ wss.on ('connection', (ws) => {
   	ws.on ('message', (message) => {  	
   		var pattern = /id\/(\w+)/;
   		var match = message.match (pattern);
+
+  		if (match == null) {
+  			return;
+  		}
+
   		var id = match ? match[1] : undefined;
 
   		if (id !== undefined) {
