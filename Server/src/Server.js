@@ -24,6 +24,7 @@ wss.on ('connection', (ws) => {
   	let pattern = /id\/([\w|:]+)/;
   	let match = message.match (pattern);
   	match = match ? match[1] : undefined;
+    console.log (message);
 
   	if (match !== undefined) {
   	  let match = match.match (/([^:]+):([^:]+)/);

@@ -20,14 +20,14 @@ serial.on('open', function (err) {
 
 switch (option) {
   case 'A':
-    init(wsA, 'A');
+    initWS(wsA, 'A');
     break;
   case 'B':
-    init(wsB, 'B');
+    initWS(wsB, 'B');
     break;
   case 'Both':
-    init(wsA, 'A');
-    init(wsB, 'B');
+    initWS(wsA, 'A');
+    initWS(wsB, 'B');
     break;
 }
 
