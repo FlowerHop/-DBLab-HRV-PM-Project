@@ -24,6 +24,7 @@ var AliveServiceManager = require('./HRVlib/AliveService');
 		}, {
 			key: 'getParameters',
 			value: function getParameters() {
+				console.log('from Patient: ' + this.aliveService.getParameters());
 				return this.aliveService.getParameters();
 			}
 		}]);

@@ -112,6 +112,7 @@
             this.updateRR (rrSamples, hrv);
         }, 
         getResults () {
+            console.log ('from HeartBeat: ' + this.results);
             return this.results + "\n";
         }
     };

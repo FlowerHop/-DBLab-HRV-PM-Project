@@ -53,6 +53,7 @@ var Patient = require('./Patient');
         if (this.patients[1]) {
           parameters += this.patients[1].getParameters();
         }
+        console.log('from StationarySensor: ' + parameters);
 
         return parameters;
       }

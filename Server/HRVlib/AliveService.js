@@ -80,6 +80,7 @@ let HeartBeatManager = require ('./HeartBeat');
             // this.mSocket.close ();
         }, 
         getParameters () {
+            console.log ('from AliveService: ' + this.mHeartBeat.getResults ());
             return this.mHeartBeat.getResults ();
         }
     };

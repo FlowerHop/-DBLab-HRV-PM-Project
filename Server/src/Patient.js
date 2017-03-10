@@ -13,6 +13,7 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 		}
 
 		getParameters () {
+			console.log ('from Patient: ' + this.aliveService.getParameters ());
 			return this.aliveService.getParameters ();
 		}
 	}
