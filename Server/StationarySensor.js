@@ -28,6 +28,7 @@ var Patient = require('./Patient');
             _this.wss[i].on('message', function (message) {
               console.log('Port :' + (i == 0 ? 'A' : 'B') + ': ' + message);
               // input signals
+              _this.patients[i].inputBioSignals(message);
             });
 
             _this.wss[i].on('close', function () {
@@ -40,6 +41,20 @@ var Patient = require('./Patient');
         for (var i = 0; i < this.wss.length; i++) {
           _loop(i);
         }
+      }
+    }, {
+      key: 'getParameters',
+      value: function getParameters() {
+        var parameters = "";
+        if (this.patients[0]) {
+          parameters += this.patients.getParameters();
+        }
+
+        if (this.patients[1]) {
+          parameters += this.parameters.getParameters();
+        }
+
+        return parameters;
       }
     }]);
 

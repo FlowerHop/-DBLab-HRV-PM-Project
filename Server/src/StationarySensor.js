@@ -16,6 +16,7 @@ let Patient = require ('./Patient');
                 this.wss[i].on ('message', (message) => {
                   console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
                   // input signals
+                  this.patients[i].inputBioSignals (message);
                 });
 
                 this.wss[i].on ('close', () => {
@@ -23,6 +24,19 @@ let Patient = require ('./Patient');
                 });
         	}
         }
+    }
+
+    getParameters () {
+        let parameters = "";
+        if (this.patients[0]) {
+          parameters += this.patients.getParameters ();
+        } 
+
+        if (this.patients[1]) {
+          parameters += this.parameters.getParameters ();
+        }
+
+        return parameters;
     }
   }
 

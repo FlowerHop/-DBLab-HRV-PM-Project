@@ -91,9 +91,16 @@ app.get ('/helloWorld', (req, res) => {
 
 app.get ('/newStationarySensor/:id', (req, res) => {
   let id = req.params.id;
-  stationarySensors[id] = new StationarySensor ();
+  stationarySensors[id] = new StationarySensor ('Max', 'William');
   console.log ('new StationarySensor: ' + id);
   res.end ();
+});
+
+app.get ('getParameters/:id', (req, res) => {
+  let stationarySensor = stationarySensors[req.params.id];
+  if (stationarySensor) {
+    res.send (stationarySensors.getParameters ());
+  }
 });
 
 server.listen (app.get ('port'), () => {

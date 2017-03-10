@@ -24,6 +24,7 @@
 
             // window.addEventListener('resize', this.onMeasure.bind(this), false);
             // this.onMeasure();
+            this.results;
         },
         onMeasure() {
             // this.mHR.width = window.innerWidth / 4;
@@ -71,28 +72,35 @@
             // else{
             //     mCon.setText("心律正常(Regular rhythm)");
             // }
-            console.log ("RR: "+hrv.getRRs()[hrv.getRRs().length-1]+"\nMean RR: " + parseInt(meanRR*100+0.5)/(100.)+"\nRMSSD: "+parseInt(hrv.getRMSSD()*100+0.5)/100.+"\nSDNN: "+parseInt(hrv.getSDNN()*100+0.5)/100.+"\nNN50: "+hrv.getNN50()+"\npNN50: "+parseInt(hrv.getpNN50()*10000+0.5)/100.+"%");
-            console.log ("\nTP: "+hrv.getTP()+"\nLF: "+hrv.getLF()+"\nHF: "+hrv.getHF()+"\nLF/HF: "+hrv.getLF()/hrv.getHF());
+            this.results = "";
+            this.results = ("RR: "+hrv.getRRs()[hrv.getRRs().length-1]+"\nMean RR: " + parseInt(meanRR*100+0.5)/(100.)+"\nRMSSD: "+parseInt(hrv.getRMSSD()*100+0.5)/100.+"\nSDNN: "+parseInt(hrv.getSDNN()*100+0.5)/100.+"\nNN50: "+hrv.getNN50()+"\npNN50: "+parseInt(hrv.getpNN50()*10000+0.5)/100.+"%") + "\n"
+                          + ("\nTP: "+hrv.getTP()+"\nLF: "+hrv.getLF()+"\nHF: "+hrv.getHF()+"\nLF/HF: "+hrv.getLF()/hrv.getHF()) + "\n"
+            // console.log ("RR: "+hrv.getRRs()[hrv.getRRs().length-1]+"\nMean RR: " + parseInt(meanRR*100+0.5)/(100.)+"\nRMSSD: "+parseInt(hrv.getRMSSD()*100+0.5)/100.+"\nSDNN: "+parseInt(hrv.getSDNN()*100+0.5)/100.+"\nNN50: "+hrv.getNN50()+"\npNN50: "+parseInt(hrv.getpNN50()*10000+0.5)/100.+"%");
+            // console.log ("\nTP: "+hrv.getTP()+"\nLF: "+hrv.getLF()+"\nHF: "+hrv.getHF()+"\nLF/HF: "+hrv.getLF()/hrv.getHF());
             //mRR.append("\nother: "+hrv.getother()+"\nl: "+hrv.getl());
             if(meanRR < 50){
-                console.log ("心跳過緩(Bradycardia)");
+                this.results += "心跳過緩(Bradycardia)";
+                // console.log ("心跳過緩(Bradycardia)");
             }
             else if(meanRR > 100){
-                console.log ("心跳過速(Tachycardia)");
+                this.results += "心跳過速(Tachycardia)";
+                // console.log ("心跳過速(Tachycardia)");
             }
             else if(hrv.isArr(32)){
-                console.log ("心律不整(Irregular rhythm)");
-                console.log (" Arr ");
+                this.results += "心律不整(Irregular rhythm)";
+                // console.log ("心律不整(Irregular rhythm)");
+                // console.log (" Arr ");
             }
             else{
-                console.log ("心律正常(Regular rhythm)");
+                this.results += "心律正常(Regular rhythm)";
+                // console.log ("心律正常(Regular rhythm)");
             }
         },
         updateRR (rr, hrv) {
             var rrString;
             var meanRR = 0;
             if (hrv.getRRs ().length < 32) {
-                console.log ("計算中(Calculating)..."+(32 - hrv.getRRs().length));
+                //console.log ("計算中(Calculating)..."+(32 - hrv.getRRs().length));
             } else {
                 this.checkCon (hrv);
             }
@@ -102,6 +110,9 @@
             // console.log(hr);
             this.updateHeartRate (Math.floor(hr+0.5));
             this.updateRR (rrSamples, hrv);
+        }, 
+        getResults () {
+            return this.results + "\n";
         }
     };
 

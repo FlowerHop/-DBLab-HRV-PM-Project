@@ -78,6 +78,9 @@ let HeartBeatManager = require ('./HeartBeat');
         }, 
         stop () {
             // this.mSocket.close ();
+        }, 
+        getParameters () {
+            return this.mHeartBeat.getResults ();
         }
     };
 
