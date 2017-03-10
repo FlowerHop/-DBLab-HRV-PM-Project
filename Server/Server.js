@@ -28,10 +28,10 @@ wss.on('connection', function (ws) {
     match = match ? match[1] : undefined;
 
     if (match !== undefined) {
-      var _match = _match.match(/([^:]+):([^:]+)/);
-      if (_match) {
-        var id = _match[1];
-        var port = _match[2];
+      match = match.match(/([^:]+):([^:]+)/);
+      if (match) {
+        var id = match[1];
+        var port = match[2];
         console.log('Receive a stationary sensor (' + id + ') port (' + port + ')');
 
         ws.send('ok');
