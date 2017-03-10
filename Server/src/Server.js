@@ -96,7 +96,7 @@ app.get ('/newStationarySensor/:id', (req, res) => {
   res.end ();
 });
 
-app.get ('getParameters/:id', (req, res) => {
+app.get ('/getParameters/:id', (req, res) => {
   let stationarySensor = stationarySensors[req.params.id];
   if (stationarySensor) {
     res.send (stationarySensors.getParameters ());
