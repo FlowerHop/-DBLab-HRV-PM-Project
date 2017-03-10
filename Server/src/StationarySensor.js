@@ -29,11 +29,11 @@ let Patient = require ('./Patient');
     getParameters () {
         let parameters = "";
         if (this.patients[0]) {
-          parameters += this.patients.getParameters ();
+          parameters += this.patients[0].getParameters ();
         } 
 
         if (this.patients[1]) {
-          parameters += this.patients.getParameters ();
+          parameters += this.patients[1].getParameters ();
         }
 
         return parameters;
