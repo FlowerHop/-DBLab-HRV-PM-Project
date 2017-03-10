@@ -100,6 +100,7 @@
             var rrString;
             var meanRR = 0;
             if (hrv.getRRs ().length < 32) {
+                this.results = ("計算中(Calculating)..."+(32 - hrv.getRRs().length)); 
                 //console.log ("計算中(Calculating)..."+(32 - hrv.getRRs().length));
             } else {
                 this.checkCon (hrv);
