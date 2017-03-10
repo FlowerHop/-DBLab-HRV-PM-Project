@@ -15,9 +15,18 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 		getParameters () {
 			return this.aliveService.getParameters ();
 		}
+
+		getLastRRs () {
+
+		}
+
+		getCSV () {
+
+		}
+
+		writeCSV () {
+
+		}
 	}
-
-
-
 	module.exports = Patient;
 })();
