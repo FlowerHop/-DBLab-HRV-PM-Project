@@ -25,9 +25,9 @@ wss.on('connection', function (ws) {
     }
     var pattern = /id\/([\w|:]+)/;
     var match = message.match(pattern);
-    match = match ? match[1] : 'undefined';
+    match = match ? match[1] : undefined;
 
-    if (match !== 'undefined') {
+    if (match !== undefined) {
       var _match = _match.match(/([^:]+):([^:]+)/);
       if (_match) {
         var id = _match[1];
