@@ -6,6 +6,8 @@ let Patient = require ('./Patient');
   		this.wss = new Array (2);
   		this.patients = (arguments[0] ? new Patient (arguments[0]) : arguments[0], 
   			               arguments[1] ? new Patient (arguments[1]) : arguments[1]);
+      console.log (arguments);
+      console.log (this.patients);
   	    // future: when server restarts, newing a Patient should be after checking past record if exists
   	}
     
