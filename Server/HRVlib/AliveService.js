@@ -54,7 +54,7 @@ let HeartBeatManager = require ('./HeartBeat');
                 var len = this.hmPacket.getECGLength();
                 var startIndex = this.hmPacket.getECGDataIndex();
                 var buffer = new Int8Array(this.hmPacket.getPacketData());
-                var tmp = 0xFF;console.log ('s');
+                var tmp = 0xFF;
                 // var tmp = new Int8Array(1); // in nodejs, it won't work
                 // tmp[0] = 0xFF;
                 for(var i = 0; i < len; i++) {
@@ -80,7 +80,6 @@ let HeartBeatManager = require ('./HeartBeat');
             // this.mSocket.close ();
         }, 
         getParameters () {
-            console.log ('from AliveService: ' + this.mHeartBeat.getResults ());
             return this.mHeartBeat.getResults ();
         }
     };

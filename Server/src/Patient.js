@@ -8,12 +8,11 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 
 		inputBioSignals (bioSignals) {
 			for (var i = 0; i < bioSignals.length; i++) {
-				this.aliveService.run (bioSignals);
+				this.aliveService.run (bioSignals[i]);
 			}
 		}
 
 		getParameters () {
-			console.log ('from Patient: ' + this.aliveService.getParameters ());
 			return this.aliveService.getParameters ();
 		}
 	}
