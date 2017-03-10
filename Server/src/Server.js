@@ -11,6 +11,7 @@ const wss = new WebSocket.Server ({ server });
 const AliveServiceManager = require ('./HRVlib/AliveService');
 let routers = {};
 let patients = {};
+let stationarySensors = {}; 
 
 wss.on ('connection', (ws) => {
   console.log ('connection');
@@ -19,33 +20,50 @@ wss.on ('connection', (ws) => {
     if (!message.match) {
       return;
     } 	
-  	var pattern = /id\/(\w+)/;
-  	var match = message.match (pattern);
+  	let pattern = /id\/([\w|:]+)/;
+  	let match = message.match (pattern);
+  	match = match ? match[1] : 'undefined';
 
-  	var id = match ? match[1] : 'undefined';
-
-  	if (id !== 'undefined') {
-  	  routers[id] = ws;
-      console.log ('Receive a router: ' +  message);
-  	  ws.send ('ok');
-      let service = new AliveServiceManager ();
-  	  ws.on ('message', (message) => {
-        for (var i = 0; i < message.length; i++) {
-            service.run(message[i]);    
+  	if (match !== 'undefined') {
+  	  let match = match.match (/([^:]+):([^:]+)/);
+  	  if (match) {
+        let id = match[1];
+        let port = match[2];
+        console.log ('Receive a stationary sensor (' +  id + ') port (' + port + ')');
+        
+        ws.send ('ok');         
+        let stationarySensor = stationarySensors[id];
+        if (stationarySensor) {
+        	switch (port) {
+               case 'A':
+                 stationarySensor.initWS (ws, undefined);
+                 break;
+               case 'B':
+                 stationarySensor.initWS (undefined, ws);
+                 break;
+        	}
         }
-  	  });
+  	  }
+  	  // // routers[id] = ws; new Stationary sensor
+  	  // ws.send ('ok');
+     //  let service = new AliveServiceManager ();
+  	  // ws.on ('message', (message) => {
+     //    for (let i = 0; i < message.length; i++) {
+     //        service.run(message[i]);    
+     //    }
+  	  // });
   	} 
   });
 
-  ws.on ('close', () => {
-  	for (var i in routers) {
-  		if (routers[i] == ws) {
-              console.log (i + ' close');
-  			delete routers[i];
-  			return;
-  		}
-  	}
-  });
+  // ws.on ('close', () => {
+  // 	for (var i in routers) {
+  // 		if (routers[i] == ws) {
+  //             console.log (i + ' close');
+  // 			delete routers[i];
+  // 			return;
+  // 		}
+  // 	}
+  // });
 });
 
 app.set ('port', process.env.PORT || 1338);
@@ -67,6 +85,12 @@ app.use ((req, res, next) => {
 
 app.get ('/helloWorld', (req, res) => {
   res.send ("HelloWorld");
+  res.end ();
+});
+
+app.get ('/newStationarySensor/:id', (req, res) => {
+  let id = req.params.id;
+  stationarySensors[id] = new StationarySensor ();
   res.end ();
 });
 
