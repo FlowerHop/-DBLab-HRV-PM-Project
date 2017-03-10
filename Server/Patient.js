@@ -15,8 +15,8 @@ var AliveServiceManager = require('./HRVlib/AliveService');
 		}
 
 		_createClass(Patient, [{
-			key: 'inputBioSinals',
-			value: function inputBioSinals(bioSignals) {
+			key: 'inputBioSignals',
+			value: function inputBioSignals(bioSignals) {
 				for (var i = 0; i < bioSignals.length; i++) {
 					this.aliveService.run(bioSignals);
 				}

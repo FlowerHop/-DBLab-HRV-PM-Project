@@ -6,7 +6,7 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
             this.aliveService = new AliveServiceManager ();
 		}
 
-		inputBioSinals (bioSignals) {
+		inputBioSignals (bioSignals) {
 			for (var i = 0; i < bioSignals.length; i++) {
 				this.aliveService.run (bioSignals);
 			}

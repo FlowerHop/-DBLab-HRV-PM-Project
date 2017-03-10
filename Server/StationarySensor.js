@@ -51,7 +51,7 @@ var Patient = require('./Patient');
         }
 
         if (this.patients[1]) {
-          parameters += this.parameters.getParameters();
+          parameters += this.patients.getParameters();
         }
 
         return parameters;
