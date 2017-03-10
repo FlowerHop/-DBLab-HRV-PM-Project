@@ -11,6 +11,7 @@
         this.contextHRUnits = "";
 
         this.hrString = "---";
+        this.results = "";
     }
     HeartBeatManager.prototype = {
         init() {
@@ -24,7 +25,6 @@
 
             // window.addEventListener('resize', this.onMeasure.bind(this), false);
             // this.onMeasure();
-            this.results;
         },
         onMeasure() {
             // this.mHR.width = window.innerWidth / 4;
