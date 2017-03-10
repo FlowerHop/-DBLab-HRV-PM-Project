@@ -9,6 +9,7 @@ const server = http.createServer (app);
 const WebSocket = require ('ws');
 const wss = new WebSocket.Server ({ server });
 const AliveServiceManager = require ('./HRVlib/AliveService');
+let StationarySensor = require ('./StationarySensor');
 let routers = {};
 let patients = {};
 let stationarySensors = {}; 

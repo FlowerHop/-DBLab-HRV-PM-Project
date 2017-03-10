@@ -11,6 +11,7 @@ var server = http.createServer(app);
 var WebSocket = require('ws');
 var wss = new WebSocket.Server({ server: server });
 var AliveServiceManager = require('./HRVlib/AliveService');
+var StationarySensor = require('./StationarySensor');
 var routers = {};
 var patients = {};
 var stationarySensors = {};
