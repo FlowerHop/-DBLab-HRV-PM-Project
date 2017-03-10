@@ -22,15 +22,11 @@ var Patient = require('./Patient');
         var _this = this,
             _arguments = arguments;
 
-        // init when this.wss[index] === undefined
-        console.log('arg0: ' + arguments[0]);
-        console.log('arg1: ' + arguments[1]);
-
         var _loop = function _loop(i) {
           if (!_this.wss[i] && _arguments[i]) {
             _this.wss[i] = _arguments[i];
             _this.wss[i].on('message', function (message) {
-              console.log('Port :' + (i == 0) ? 'A' : 'B' + ': ' + message);
+              console.log('Port :' + (i == 0 ? 'A' : 'B') + ': ' + message);
               // input signals
             });
 
@@ -40,6 +36,7 @@ var Patient = require('./Patient');
           }
         };
 
+        // init when this.wss[index] === undefined
         for (var i = 0; i < this.wss.length; i++) {
           _loop(i);
         }
