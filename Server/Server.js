@@ -92,6 +92,7 @@ app.get('/helloWorld', function (req, res) {
 app.get('/newStationarySensor/:id', function (req, res) {
   var id = req.params.id;
   stationarySensors[id] = new StationarySensor();
+  console.log('new StationarySensor: ' + id);
   res.end();
 });
 
