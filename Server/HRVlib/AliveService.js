@@ -45,7 +45,6 @@ let HeartBeatManager = require ('./HeartBeat');
         //     }.bind(this);
         // },
         run(mBytesBuffer) {
-            console.log ('r');
             if(this.hmPacket.add(mBytesBuffer)) {
                 // We have a packet of data from the heart monitor
                 // this.mEcgView.onAlivePacket(this.sampleCount, this.hmPacket);
@@ -55,7 +54,7 @@ let HeartBeatManager = require ('./HeartBeat');
                 var len = this.hmPacket.getECGLength();
                 var startIndex = this.hmPacket.getECGDataIndex();
                 var buffer = new Int8Array(this.hmPacket.getPacketData());
-                var tmp = 0xFF;
+                var tmp = 0xFF;console.log ('s');
                 // var tmp = new Int8Array(1); // in nodejs, it won't work
                 // tmp[0] = 0xFF;
                 for(var i = 0; i < len; i++) {
