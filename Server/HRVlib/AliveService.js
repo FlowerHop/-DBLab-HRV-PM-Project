@@ -45,6 +45,7 @@ let HeartBeatManager = require ('./HeartBeat');
         //     }.bind(this);
         // },
         run(mBytesBuffer) {
+            console.log ('r');
             if(this.hmPacket.add(mBytesBuffer)) {
                 // We have a packet of data from the heart monitor
                 // this.mEcgView.onAlivePacket(this.sampleCount, this.hmPacket);
