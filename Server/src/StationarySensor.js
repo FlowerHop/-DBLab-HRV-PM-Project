@@ -12,6 +12,7 @@ let Patient = require ('./Patient');
     initWS (wsA, wsB) { // init when this.wss[index] === undefined
         for (let i = 0; i < this.wss.length; i++) {
         	if (!this.wss[i] && arguments[i]) {
+            console.log (i);
                 this.wss[i] = arguments[i];
                 this.wss[i].on ('message', (message) => {
                   console.log ('Port :' + (i == 0) ? 'A' : 'B' + ': ' + message);

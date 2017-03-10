@@ -24,6 +24,7 @@ var Patient = require('./Patient');
 
         var _loop = function _loop(i) {
           if (!_this.wss[i] && _arguments[i]) {
+            console.log(i);
             _this.wss[i] = _arguments[i];
             _this.wss[i].on('message', function (message) {
               console.log('Port :' + (i == 0) ? 'A' : 'B' + ': ' + message);
