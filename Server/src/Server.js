@@ -120,7 +120,7 @@ app.get ('/getStationarySensorIDs', (req, res) => {
   res.send (JSON.stringify (ids));
 });
 
-app,get ('/getStationarySensors', (req, res) => {
+app.get ('/getStationarySensors', (req, res) => {
   res.send (JSON.stringify (stationarySensors));
 })
 
