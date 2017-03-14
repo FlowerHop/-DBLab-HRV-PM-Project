@@ -19,9 +19,9 @@ var AliveServiceManager = require('./HRVlib/AliveService');
 			key: 'inputBioSignals',
 			value: function inputBioSignals(bioSignals) {
 				var mBytesBuffer = new Int8Array(bioSignals);
-				for (var i = 0; i < mBytesBuffer.length; i++) {
-					this.aliveService.run(mBytesBuffer[i]);
-				}
+				// for (var i = 0; i < mBytesBuffer.length; i++) {
+				this.aliveService.run(mBytesBuffer);
+				// }
 			}
 		}, {
 			key: 'getParameters',
