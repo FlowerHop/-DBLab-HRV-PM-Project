@@ -18,7 +18,7 @@ let Patient = require ('./Patient');
                   // console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
                   // input signals
                   // this.patients[i].inputBioSignals (message);
-                  let buf = new Int16Array (message);
+                  let buf = new Int8Array (message);
                   console.log ('buf: ' + buf);
                 });
 
