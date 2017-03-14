@@ -10,7 +10,8 @@ var option = process.argv[4];
 var wsA = void 0;
 var wsB = void 0;
 
-var serial = new serialport('/dev/ttyACM' + serialportNum, { baudrate: 9600 });
+// let serial = new serialport ('/dev/ttyACM' + serialportNum, {baudrate: 9600});
+var serial = new serialport('/dev/cu.usbmodem1421', { baudRate: 9600 });
 
 serial.on('open', function (err) {
   if (err) {

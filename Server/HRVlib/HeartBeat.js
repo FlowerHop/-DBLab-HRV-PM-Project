@@ -72,7 +72,6 @@
             // else{
             //     mCon.setText("心律正常(Regular rhythm)");
             // }
-            this.results = "";
             this.results.RRs = hrv.getRRs ();
             this.results.meanRR = parseInt(meanRR*100+0.5)/(100.);
             this.results.RMSSD = parseInt(hrv.getRMSSD()*100+0.5)/(100.);

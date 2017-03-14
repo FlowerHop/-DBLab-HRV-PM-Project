@@ -8,7 +8,8 @@ let option = process.argv[4];
 let wsA;
 let wsB;
 
-let serial = new serialport ('/dev/ttyACM' + serialportNum, {baudrate: 9600});
+// let serial = new serialport ('/dev/ttyACM' + serialportNum, {baudrate: 9600});
+let serial = new serialport ('/dev/cu.usbmodem1421', {baudRate: 9600});
 
 serial.on ('open', (err) => {
   if (err) {
