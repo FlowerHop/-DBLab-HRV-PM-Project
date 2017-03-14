@@ -30,12 +30,12 @@ wss.on('connection', function (ws) {
     if (match !== undefined) {
       match = match.match(/([^:]+):([^:]+)/);
       if (match) {
-        var id = match[1];
+        var _id = match[1];
         var port = match[2];
-        console.log('Receive a stationary sensor (' + id + ') port (' + port + ')');
+        console.log('Receive a stationary sensor (' + _id + ') port (' + port + ')');
 
         ws.send('ok');
-        var stationarySensor = stationarySensors[id];
+        var stationarySensor = stationarySensors[_id];
         if (stationarySensor) {
           switch (port) {
             case 'A':
@@ -91,7 +91,7 @@ app.get('/helloWorld', function (req, res) {
 
 app.get('/newStationarySensor/:id', function (req, res) {
   var id = req.params.id;
-  stationarySensors[id] = new StationarySensor({ id: '1', name: 'Max' }, { id: '2', name: 'William' });
+  stationarySensors[id] = new StationarySensor(id, { id: '1', name: 'Max' }, { id: '2', name: 'William' });
   stationarySensors[id].patients.forEach(function (patient) {
     patients[patient.id] = patient;
   });
@@ -100,14 +100,32 @@ app.get('/newStationarySensor/:id', function (req, res) {
 });
 
 app.get('/getParameters/:id', function (req, res) {
-  for (var k in patients) {
-    var patient = patients[k];
-    if (patient.id == req.params.id) {
-      console.log('ss');
-      res.send(JSON.stringify(patient.getParameters()));
-      return;
-    }
+  // for (let k in patients) {
+  //   let patient = patients[k];
+  //   if (patient.id == req.params.id) {
+  //     res.send (JSON.stringify (patient.getParameters ()));
+  //     return;
+  //   } 
+  // }
+  if (stationarySensors[id]) {
+    res.send(JSON.stringify(stationarySensors[id].getParameters()));
   }
+});
+
+app.get('/getStationarySensorIDs', function (req, res) {
+  var ids = [];
+  stationarySensors.forEach(function (stationarySensor) {
+    ids.push(stationarySensor.id);
+  });
+  res.send(JSON.stringify(ids));
+});
+
+app, get('/getStationarySensors', function (req, res) {
+  res.send(JSON.stringify(stationarySensors));
+});
+
+app.get('/getPatients', function (req, res) {
+  res.send(JSON.stringify(patients));
 });
 
 server.listen(app.get('port'), function () {

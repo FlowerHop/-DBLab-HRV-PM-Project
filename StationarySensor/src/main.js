@@ -8,7 +8,8 @@ let option = process.argv[4];
 let wsA;
 let wsB;
 
-let serial = new serialport ('/dev/rfcomm' + serialportNum, {baudrate: 9600});
+let serial = new serialport ('/dev/ttyACM' + serialportNum, {baudrate: 9600});
+
 serial.on ('open', (err) => {
   if (err) {
     console.log (err);
@@ -43,7 +44,16 @@ function initWS (ws, num) {
     if (message == 'ok') {
       console.log ('start transform');
       serial.on ('data', (data) => {
-        ws.send (data);
+        let d = data.toString ('utf-8');
+        let results = d.match (/(\[[^\[|^\]]+\])/g);
+        let packet = [];
+        for (let i in results) {
+          let result = results[i].match (/\[([^\[|^\]]+)\]/)[1];
+          if (result !== 'e') {
+            packet.push = (result - 3300/10000)/10;
+          }
+        } 
+        ws.send (packet);
       });
     }
   });

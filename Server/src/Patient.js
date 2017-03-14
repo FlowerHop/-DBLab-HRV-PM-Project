@@ -17,10 +17,6 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 			return this.aliveService.getParameters ();
 		}
 
-		getLastRRs () {
-
-		}
-
 		getCSV () {
 
 		}

@@ -10,7 +10,8 @@ var option = process.argv[4];
 var wsA = void 0;
 var wsB = void 0;
 
-var serial = new serialport('/dev/rfcomm' + serialportNum, { baudrate: 9600 });
+var serial = new serialport('/dev/ttyACM' + serialportNum, { baudrate: 9600 });
+
 serial.on('open', function (err) {
   if (err) {
     console.log(err);
@@ -45,7 +46,16 @@ function initWS(ws, num) {
     if (message == 'ok') {
       console.log('start transform');
       serial.on('data', function (data) {
-        ws.send(data);
+        var d = data.toString('utf-8');
+        var results = d.match(/(\[[^\[|^\]]+\])/g);
+        var packet = [];
+        for (var i in results) {
+          var result = results[i].match(/\[([^\[|^\]]+)\]/)[1];
+          if (result !== 'e') {
+            packet.push = (result - 3300 / 10000) / 10;
+          }
+        }
+        ws.send(packet);
       });
     }
   });

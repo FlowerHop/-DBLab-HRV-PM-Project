@@ -28,9 +28,6 @@ var AliveServiceManager = require('./HRVlib/AliveService');
 				return this.aliveService.getParameters();
 			}
 		}, {
-			key: 'getLastRRs',
-			value: function getLastRRs() {}
-		}, {
 			key: 'getCSV',
 			value: function getCSV() {}
 		}, {
