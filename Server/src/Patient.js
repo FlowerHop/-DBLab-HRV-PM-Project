@@ -8,10 +8,9 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 		}
 
 		inputBioSignals (bioSignals) {
-			console.log (typeof bioSignals);
-			console.log (bioSignals);
-			for (var i = 0; i < bioSignals.length; i++) {
-				this.aliveService.run (bioSignals[i]);
+			var mBytesBuffer = new Int8Array (bioSignals);
+			for (var i = 0; i < mBytesBuffer.length; i++) {
+				this.aliveService.run (mBytesBuffer[i]);
 			}
 		}
 
