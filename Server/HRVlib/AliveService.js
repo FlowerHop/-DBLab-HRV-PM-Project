@@ -55,7 +55,6 @@ let HeartBeatManager = require ('./HeartBeat');
             // tmp[0] = 0xFF;
             for(var i = 0; i < len; i++) {
                 // var nDatum = (buffer[startIndex+i] & tmp);
-                console.log (mBytesBuffer[i]);
                 var nDelay = this.mHRDet.process(mBytesBuffer[i]);
                 if(nDelay!=0) {
                     // Update the heart-rate in the UI
