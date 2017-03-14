@@ -8,8 +8,9 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 		}
 
 		inputBioSignals (bioSignals) {
+			console.log (typeof bioSignals);
+			console.log (bioSignals);
 			for (var i = 0; i < bioSignals.length; i++) {
-				console.log (bioSignals[i]);
 				this.aliveService.run (bioSignals[i]);
 			}
 		}
