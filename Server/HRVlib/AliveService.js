@@ -45,32 +45,30 @@ let HeartBeatManager = require ('./HeartBeat');
         //     }.bind(this);
         // },
         run(mBytesBuffer) {
-            if(this.hmPacket.add(mBytesBuffer)) {
-                // We have a packet of data from the heart monitor
-                // this.mEcgView.onAlivePacket(this.sampleCount, this.hmPacket);
-                // this.mAccView.onAlivePacket(this.sampleCount, this.hmPacket);
+            // We have a packet of data from the heart monitor
+            // this.mEcgView.onAlivePacket(this.sampleCount, this.hmPacket);
+            // this.mAccView.onAlivePacket(this.sampleCount, this.hmPacket);
 
-                // Process the ECG data
-                var len = mBytesBuffer.length;
-                // var tmp = new Int8Array(1); // in nodejs, it won't work
-                // tmp[0] = 0xFF;
-                for(var i = 0; i < len; i++) {
-                    // var nDatum = (buffer[startIndex+i] & tmp);
-                    var nDelay = this.mHRDet.process(mBytesBuffer[i]);
-                    if(nDelay!=0) {
-                        // Update the heart-rate in the UI
-                        // console.log("Update the heart rate");
-                        this.mHeartBeat.onAliveHeartBeat(
-                            this.sampleCount+i+1-nDelay,
-                            this.mHRDet.getHR(),
-                            this.mHRDet.getLastRR(),
-                            this.mHRDet.getHRV ()
-                        );
-                    }
+            // Process the ECG data
+            var len = mBytesBuffer.length;
+            // var tmp = new Int8Array(1); // in nodejs, it won't work
+            // tmp[0] = 0xFF;
+            for(var i = 0; i < len; i++) {
+                // var nDatum = (buffer[startIndex+i] & tmp);
+                var nDelay = this.mHRDet.process(mBytesBuffer[i]);
+                if(nDelay!=0) {
+                    // Update the heart-rate in the UI
+                    // console.log("Update the heart rate");
+                    this.mHeartBeat.onAliveHeartBeat(
+                        this.sampleCount+i+1-nDelay,
+                        this.mHRDet.getHR(),
+                        this.mHRDet.getLastRR(),
+                        this.mHRDet.getHRV ()
+                    );
                 }
-                this.sampleCount += len;
-                // console.log("sampleCount = " + this.sampleCount);
             }
+            this.sampleCount += len;
+            // console.log("sampleCount = " + this.sampleCount);            
         }, 
         stop () {
             // this.mSocket.close ();
