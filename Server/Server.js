@@ -30,12 +30,12 @@ wss.on('connection', function (ws) {
     if (match !== undefined) {
       match = match.match(/([^:]+):([^:]+)/);
       if (match) {
-        var _id = match[1];
+        var id = match[1];
         var port = match[2];
-        console.log('Receive a stationary sensor (' + _id + ') port (' + port + ')');
+        console.log('Receive a stationary sensor (' + id + ') port (' + port + ')');
 
         ws.send('ok');
-        var stationarySensor = stationarySensors[_id];
+        var stationarySensor = stationarySensors[id];
         if (stationarySensor) {
           switch (port) {
             case 'A':
@@ -107,7 +107,8 @@ app.get('/getParameters/:id', function (req, res) {
   //     return;
   //   } 
   // }
-  if (stationarySensors[req.params.id]) {
+  var id = req.params.id;
+  if (stationarySensors[id]) {
     res.send(JSON.stringify(stationarySensors[id].getParameters()));
   }
 });
