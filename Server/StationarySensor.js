@@ -29,7 +29,9 @@ var Patient = require('./Patient');
             _this.wss[i].on('message', function (message) {
               // console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
               // input signals
-              _this.patients[i].inputBioSignals(message);
+              // this.patients[i].inputBioSignals (message);
+              var buf = new Int8Array(message);
+              console.log('buf: ' + buf);
             });
 
             _this.wss[i].on('close', function () {
