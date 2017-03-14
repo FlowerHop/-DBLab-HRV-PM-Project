@@ -52,10 +52,12 @@ function initWS(ws, num) {
         for (var i in results) {
           var result = results[i].match(/\[([^\[|^\]]+)\]/)[1];
           if (result !== 'e') {
-            packet.push = (result - 3300 / 10000) / 10;
+            packet.push((result - 3300 / 10000) / 10);
           }
         }
-        ws.send(packet);
+        if (packet.length != 0) {
+          ws.send(packet);
+        }
       });
     }
   });
