@@ -7,10 +7,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var AliveServiceManager = require('./HRVlib/AliveService');
 (function () {
 	var Patient = function () {
-		function Patient(id) {
+		function Patient(id, name) {
 			_classCallCheck(this, Patient);
 
 			this.id = id;
+			this.name = name;
 			this.aliveService = new AliveServiceManager();
 		}
 

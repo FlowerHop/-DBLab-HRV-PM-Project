@@ -91,15 +91,22 @@ app.get('/helloWorld', function (req, res) {
 
 app.get('/newStationarySensor/:id', function (req, res) {
   var id = req.params.id;
-  stationarySensors[id] = new StationarySensor('Max', 'William');
+  stationarySensors[id] = new StationarySensor({ id: '1', name: 'Max' }, { id: '2', name: 'William' });
+  stationarySensors[id].patients.forEach(function (patient) {
+    patients[patient.id] = patient;
+  });
   console.log('new StationarySensor: ' + id);
   res.end();
 });
 
 app.get('/getParameters/:id', function (req, res) {
-  var stationarySensor = stationarySensors[req.params.id];
-  if (stationarySensor) {
-    res.send(stationarySensor.getParameters());
+  for (var k in patients) {
+    var patient = patients[k];
+    if (patient.id == req.params.id) {
+      console.log('ss');
+      res.send(JSON.stringify(patient.getParameters()));
+      return;
+    }
   }
 });
 

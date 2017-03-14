@@ -91,16 +91,41 @@ app.get ('/helloWorld', (req, res) => {
 
 app.get ('/newStationarySensor/:id', (req, res) => {
   let id = req.params.id;
-  stationarySensors[id] = new StationarySensor ('Max', 'William');
+  stationarySensors[id] = new StationarySensor (id, { id: '1', name: 'Max'}, { id: '2', name: 'William'});
+  stationarySensors[id].patients.forEach ((patient) => {
+    patients[patient.id] = patient;
+  });
   console.log ('new StationarySensor: ' + id);
   res.end ();
 });
 
 app.get ('/getParameters/:id', (req, res) => {
-  let stationarySensor = stationarySensors[req.params.id];
-  if (stationarySensor) {
-    res.send (stationarySensor.getParameters ());
+  // for (let k in patients) {
+  //   let patient = patients[k];
+  //   if (patient.id == req.params.id) {
+  //     res.send (JSON.stringify (patient.getParameters ()));
+  //     return;
+  //   } 
+  // }
+  if (stationarySensors[id]) {
+    res.send (JSON.stringify (stationarySensors[id].getParameters ()))
   }
+});
+
+app.get ('/getStationarySensorIDs', (req, res) => {
+  let ids = [];
+  stationarySensors.forEach ((stationarySensor) => {
+    ids.push (stationarySensor.id);
+  });
+  res.send (JSON.stringify (ids));
+});
+
+app,get ('/getStationarySensors', (req, res) => {
+  res.send (JSON.stringify (stationarySensors));
+})
+
+app.get ('/getPatients', (req, res) => {
+  res.send (JSON.stringify (patients));
 });
 
 server.listen (app.get ('port'), () => {
