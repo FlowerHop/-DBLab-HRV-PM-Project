@@ -30,7 +30,7 @@ var Patient = require('./Patient');
               // console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
               // input signals
               // this.patients[i].inputBioSignals (message);
-              var buf = new Int8Array(message);
+              var buf = new Int16Array(message);
               console.log('buf: ' + buf);
             });
 
