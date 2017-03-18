@@ -1,31 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patients Management</title>
+    <script src="https://code.jquery.com/jquery-3.2.0.js" integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.16/browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+    <script type="text/babel" src="src/main.js"></script> -->
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
 </head>
 <body>
-    <p>HelloWorld!</p>
-    <script type="text/javascript">
-        window.onload = function () {
-        	var mSocket = new WebSocket("ws://140.115.51.30:1338");
-            // this.mSocket.binaryType = "arraybuffer";
+    <!-- <h1>Hospital Alarm System</h1> -->
+    <div id='app' class='container' style="width: 100%; height: 100%">
+    </div>
 
-            mSocket.onopen = function (evt) {
-                console.log("Connection established");
-            };
-
-            mSocket.onmessage = function (evt) {
-                console.log ('Receive from Server: ' + evt.data);
-            };
-
-            mSocket.onerror = function (evt) {
-                console.log("Error: " + evt.data);
-            };
-
-            mSocket.onclose = function (evt) {
-                console.log("Connection closed");
-            }
-        }
-    </script>
+    <script src="./app/dist/src/bundle.js"></script>
 </body>
 </html>
