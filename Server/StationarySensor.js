@@ -8,56 +8,69 @@ var Patient = require('./Patient');
 
 (function () {
   var StationarySensor = function () {
-    function StationarySensor(id) {
+    function StationarySensor(id, patient) {
       _classCallCheck(this, StationarySensor);
 
       this.id = id;
-      this.wss = new Array(2);
-      this.patients = [arguments[1] ? new Patient(arguments[1].id, arguments[1].name) : arguments[0], arguments[2] ? new Patient(arguments[2].id, arguments[2].name) : arguments[1]];
+      this.ws;
+      this.patient = patient;
+      // this.wss = new Array (2);
+      // this.patients = [arguments[1] ? new Patient (arguments[1].id, arguments[1].name) : arguments[0], 
+      // arguments[2] ? new Patient (arguments[2].id, arguments[2].name) : arguments[1]];
       // future: when server restarts, newing a Patient should be after checking past record if exists
     }
 
+    // initWS (wsA, wsB) { // init when this.wss[index] === undefined
+    //     for (let i = 0; i < this.wss.length; i++) {
+    //     	if (!this.wss[i] && arguments[i]) {
+    //             this.wss[i] = arguments[i];
+    //             this.wss[i].on ('message', (message) => {
+    //               // console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
+    //               // input signals
+    //               this.patients[i].inputBioSignals (message);
+    //             });
+
+    //             this.wss[i].on ('close', () => {
+    //             	this.wss[i] = undefined;
+    //             });
+    //     	}
+    //     }
+    // }
+
     _createClass(StationarySensor, [{
       key: 'initWS',
-      value: function initWS(wsA, wsB) {
-        var _this = this,
-            _arguments = arguments;
+      value: function initWS(ws) {
+        var _this = this;
 
-        var _loop = function _loop(i) {
-          if (!_this.wss[i] && _arguments[i]) {
-            _this.wss[i] = _arguments[i];
-            _this.wss[i].on('message', function (message) {
-              // console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
-              // input signals
-              _this.patients[i].inputBioSignals(message);
-            });
-
-            _this.wss[i].on('close', function () {
-              _this.wss[i] = undefined;
-            });
-          }
-        };
-
-        // init when this.wss[index] === undefined
-        for (var i = 0; i < this.wss.length; i++) {
-          _loop(i);
+        if (!this.ws) {
+          this.ws = ws;
         }
-      }
-    }, {
-      key: 'getParameters',
-      value: function getParameters() {
-        var parameters = [];
 
-        this.patients.forEach(function (patient) {
-          parameters.push({
-            id: patient.id,
-            name: patient.name,
-            parameters: patient.getParameters()
-          });
+        this.ws.on('message', function (message) {
+          if (_this.patient) {
+            _this.patient.inputBioSignals(message);
+          }
         });
 
-        return parameters;
+        this.ws.on('close', function () {
+          _this.ws = undefined;
+        });
       }
+
+      // getParameters () {
+      //     let parameters = [];
+
+      //     this.patients.forEach ((patient) => {
+      //       parameters.push ({
+      //         id: patient.id, 
+      //         name: patient.name,
+      //         parameters: patient.getParameters ()
+      //       });  
+      //     });
+
+      //     return parameters;
+      // }
+
     }]);
 
     return StationarySensor;

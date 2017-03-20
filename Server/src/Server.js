@@ -3,6 +3,7 @@ const http = require ('http');
 const bodyParser = require ('body-parser');
 const queryString = require ('querystring');
 const request = require ('request');
+const firebase = require ('firebase');
 
 const app = express ();
 const server = http.createServer (app);
@@ -13,6 +14,43 @@ let StationarySensor = require ('./StationarySensor');
 let routers = {};
 let patients = {};
 let stationarySensors = {}; 
+
+let stationarySensorIDs = [];
+let patientIDs = [];
+let monitor = {};
+
+firebase.initializeApp({
+  apiKey: "AIzaSyAepbb4RlwQQclrz4I2dZjlvgOFun_zO5M",
+  authDomain: "healthcare-add09.firebaseapp.com",
+  databaseURL: "https://healthcare-add09.firebaseio.com",
+  storageBucket: "healthcare-add09.appspot.com",
+  messagingSenderId: "898550084069"
+});
+
+let auth = firebase.auth ();
+auth.signInWithEmailAndPassword ('l941166@hotmail.com', '55555555').catch (function (err) {
+ console.log (err);
+});
+
+let database = firebase.database ();
+let stationarySensorsRef = database.ref ('stationarySensors/');
+let patientsRef = database.ref ('patients/');
+let monitorRef = database.ref ('monitor/');
+
+stationarySensorsRef.on ('value', (snapShot) => {
+  stationarySensorIDs = snapShot.val ();
+});
+
+patientsRef.on ('value', (snapShot) => {
+  patientIDs = [];
+  snapShot.val ().forEach ((patient) => {
+    patientIDs.push (patient.id);
+  });
+});
+
+monitorRef.on ('value', (snapShot) => {
+  monitor = snapShot.val ();
+});
 
 wss.on ('connection', (ws) => {
   console.log ('connection');
@@ -89,6 +127,40 @@ app.get ('/helloWorld', (req, res) => {
   res.end ();
 });
 
+app.post ('/newStationarySensor/', (req, res) => {
+  let stationarySensorID = req.body.stationarySensorID;
+  database.ref ('stationarySensors/' + stationarySensorIDs.length).set ({
+    id: stationarySensorID
+  });
+
+  let newMonitor = {};
+  newMonitor[stationarySensorID] = 'Empty';
+
+  database.ref ('monitor/').update (newMonitor);
+  res.send ();
+});
+
+app.post ('/updateMonitor/', (req, res) => {
+  let newMonitor = req.body;
+
+  database.ref ('monitor/').update (newMonitor);
+  res.send ();
+});
+
+app.post ('/removeStationarySensor/', (req, res) => {
+  let stationarySensorID = req.body.stationarySensorID;
+  stationarySensorIDs.forEach ((elem, index) => {
+    if (stationarySensorID == elem.id) {
+      stationarySensorIDs.splice (index, 1);
+      delete monitor[stationarySensorID];
+      database.ref ('stationarySensors/').set (stationarySensorIDs);
+      database.ref ('monitor/').set (monitor);
+      res.send ();
+      return;
+    }
+  });
+});
+
 app.get ('/newStationarySensor/:id', (req, res) => {
   let id = req.params.id;
   stationarySensors[id] = new StationarySensor (id, { id: '1', name: 'Max'}, { id: '2', name: 'William'});
@@ -107,6 +179,8 @@ app.get ('/getParameters/:id', (req, res) => {
   //     return;
   //   } 
   // }
+
+  // need to remove because stationarySensor don't care about parameter
   let id = req.params.id;
   if (stationarySensors[id]) {
     res.send (JSON.stringify (stationarySensors[id].getParameters ()))
@@ -114,19 +188,27 @@ app.get ('/getParameters/:id', (req, res) => {
 });
 
 app.get ('/getStationarySensorIDs', (req, res) => {
-  let ids = [];
-  stationarySensors.forEach ((stationarySensor) => {
-    ids.push (stationarySensor.id);
-  });
-  res.send (JSON.stringify (ids));
+  // let ids = [];
+  // stationarySensors.forEach ((stationarySensor) => {
+  //   ids.push (stationarySensor.id);
+  // });
+  res.send (JSON.stringify (stationarySensorIDs));
 });
 
 app.get ('/getStationarySensors', (req, res) => {
   res.send (JSON.stringify (stationarySensors));
 })
 
+app.get ('/getMonitor', (req, res) => {
+  res.send (JSON.stringify (monitor));
+})
+
 app.get ('/getPatients', (req, res) => {
   res.send (JSON.stringify (patients));
+});
+
+app.get ('/getPatientIDs', (req, res) => {
+  res.send (JSON.stringify (patientIDs));
 });
 
 server.listen (app.get ('port'), () => {

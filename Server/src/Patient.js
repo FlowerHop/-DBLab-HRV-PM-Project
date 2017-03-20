@@ -5,6 +5,7 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
             this.id = id;
             this.name = name;
             this.aliveService = new AliveServiceManager ();
+            this.parameters = this.aliveService.getParameters ();
 		}
 
 		inputBioSignals (bioSignals) {

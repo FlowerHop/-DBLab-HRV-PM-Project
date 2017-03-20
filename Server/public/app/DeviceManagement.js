@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import bootstrap from 'bootstrap';
 
 let patientIDs = ['A12', 'B33', 'C31'];
-
+let serverURL = 'http://localhost:1338/';
 class DeviceManagement extends Component {
     constructor (props) {
       super (props);
@@ -38,57 +38,110 @@ class DeviceManagement extends Component {
 class StationaryTable extends Component {
     constructor (props) {
     	super (props);
-        this.state = {
-        	stationaryIDs: ['a', 'b', 'c'],
-        	monitor: {
-        		a: 'B33', 
-        		b: 'Empty',
-        		c: 'Empty'
-        	},
-        	stationaryIDInput: ''
-        };
-        this.monitorChange = this.monitorChange.bind (this);
-        this.newStationaryID = this.newStationaryID.bind (this);
-        this.handleInputChange = this.handleInputChange.bind (this);
+      this.state = {
+        stationarySensorIDs: ['a', 'b', 'c'],
+        monitor: {
+        	a: 'B33', 
+        	b: 'Empty',
+        	c: 'Empty'
+        },
+        stationarySensorIDInput: ''
+      };
+
+      this.monitorChange = this.monitorChange.bind (this);
+      this.newStationarySensorID = this.newStationarySensorID.bind (this);
+      this.handleInputChange = this.handleInputChange.bind (this);  
+      this.loadingDataFromServer = this.loadingDataFromServer.bind (this);
+    }
+
+    loadingDataFromServer () {
+      fetch (serverURL + 'getStationarySensorIDs')
+      .then((response) => response.json ())
+      .then ((response) => {
+        // console.log (response);  
+        let stationarySensorIDs = [];
+        response.forEach ((stationarySensor) => {
+          stationarySensorIDs.push (stationarySensor.id);
+        });
+        this.setState ({stationarySensorIDs: stationarySensorIDs});      
+      })
+      .catch ((err) => {
+        console.log (err);
+      });
+      
+
+      // next will move to the top
+      fetch (serverURL + 'getPatientIDs')
+      .then ((response) => response.json ())
+      .then ((response) => {
+        // console.log (response);
+        patientIDs = response;      
+      })
+      .catch ((err) => {
+        console.log (err);
+      });
+
+      fetch (serverURL + 'getMonitor')
+      .then ((response) => response.json ())
+      .then ((response) => {
+        this.setState ({monitor: response});
+      })
+      .catch ((err) => {
+        console.log (err);
+      });
     }
  
     componentDidMount () {
-
+      this.loadingDataFromServer ();
+      this.loadingInterval = setInterval (this.loadingDataFromServer, 2000);
     }
 
     componentWillUnmount () {
-
+      clearInterval (this.loadingInterval);
     }
 
-    monitorChange (stationaryID, patientID) {
-      let monitor = this.state.monitor;
-      monitor[stationaryID] = patientID;
-      this.setState ({monitor: monitor});
-    }
-
-    newStationaryID () {
-      let stationaryID = this.state.stationaryIDInput;
-      this.state.stationaryIDs.map ((id) => {
-        if (id == stationaryID) {
-        	return;
-        }
+    monitorChange (stationarySensorID, patientID) {
+      let newMonitor = {};
+      newMonitor[stationarySensorID] = patientID;
+      // post method to Server
+      fetch (serverURL + 'updateMonitor/', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMonitor)
       });
+    }
+
+    newStationarySensorID () {
+      let stationarySensorID = this.state.stationarySensorIDInput;
+      // this.state.stationarySensorIDs.map ((id) => {
+      //   if (id == stationarySensorID) {
+      //   	return;
+      //   }
+      // });
        
-      let stationaryIDs = this.state.stationaryIDs;
-      let monitor = this.state.monitor;
-      stationaryIDs.push (stationaryID);
-      monitor[stationaryID] = 'Empty';
-
-      this.setState ({
-      	stationaryIDs: stationaryIDs,
-      	monitor: monitor
-      });
+      // let stationarySensorIDs = this.state.stationarySensorIDs;
+      // let monitor = this.state.monitor;
+      // stationarySensorIDs.push (stationarySensorID);
+      // monitor[stationarySensorID] = 'Empty';
 
       // post method to Server
+      fetch (serverURL + 'newStationarySensor/', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          stationarySensorID: stationarySensorID
+        })
+      });
     }
 
     handleInputChange (evt) {
-      this.setState ({stationaryIDInput: evt.target.value});
+      this.setState ({stationarySensorIDInput: evt.target.value});
     }
 
     render () {
@@ -104,19 +157,34 @@ class StationaryTable extends Component {
       	      </tr>
       	    </thead>
       	    <tbody>
-      	      {this.state.stationaryIDs.map ((stationaryID, index) => {
+      	      {this.state.stationarySensorIDs.map ((stationarySensorID, index) => {
       	      	row++;
       	    	return (
       	    	  <tr key={row}>
       	    		<td key={row + ", " + (index)}>{index + 1}</td> 
-      	    		<td key={row + ", " + (index) + ", " + stationaryID}>{stationaryID}</td>
+      	    		<td key={row + ", " + (index) + ", " + stationarySensorID}>
+                  {stationarySensorID}
+                  <button className="btn btn-danger pull-right" onClick={() => {
+                    fetch (serverURL + 'removeStationarySensor/', {
+                        method: 'POST',
+                        headers: {
+                          'Accept': 'application/json',
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          stationarySensorID: stationarySensorID
+                        })
+                      });
+                    }
+                  }>remove</button>
+                </td>
       	    		<td className="dropdown" key={row + ", " + (index) + ", " + "patientID"}>
                       <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {this.state.monitor[stationaryID]}
+                        {this.state.monitor[stationarySensorID]}
                         <span className="caret"></span>
                       </a>
                       <ul className="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                        <li onClick={() => {this.monitorChange (stationaryID, "Empty")}}>Empty</li>
+                        <li onClick={() => {this.monitorChange (stationarySensorID, "Empty")}}>Empty</li>
                         {patientIDs.map ((patientID, index) => {
                           for (let k in this.state.monitor) {
                           	if (this.state.monitor[k] == patientID) {
@@ -124,7 +192,7 @@ class StationaryTable extends Component {
                           	}
                           }
                           return (
-                          	<li key={index} onClick={() => {this.monitorChange (stationaryID, patientID)}}>{patientID}</li>
+                          	<li key={index} onClick={() => {this.monitorChange (stationarySensorID, patientID)}}>{patientID}</li>
                           );
                         })}
                       </ul>
@@ -138,11 +206,11 @@ class StationaryTable extends Component {
       	  <form>
       	    <div className="row">
       	      <div className="form-group col-md-8" >
-      	  	    <lable className="sr-only" htmlFor="stationaryIDInput">New Stationary Sensor</lable>
-      	  	    <input onChange={this.handleInputChange} type="text" className="form-control" id="stationaryIDInput" placeholder="Stationary Sensor ID" ref="stationaryIDInput"></input>
+      	  	    <lable className="sr-only" htmlFor="stationarySensorIDInput">New Stationary Sensor</lable>
+      	  	    <input onChange={this.handleInputChange} type="text" className="form-control" id="stationarySensorIDInput" placeholder="Stationary Sensor ID" ref="stationarySensorIDInput"></input>
       	  	  </div>
       	  	  <div className="col-md-4">
-        	  	<button type="button" onClick={this.newStationaryID} className="btn btn-primary btn-block">New</button>
+        	  	<button type="button" onClick={this.newStationarySensorID} className="btn btn-primary btn-block">New</button>
       	  	  </div>
       	  	</div>
       	  </form>

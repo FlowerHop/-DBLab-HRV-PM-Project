@@ -13,6 +13,7 @@ var AliveServiceManager = require('./HRVlib/AliveService');
 			this.id = id;
 			this.name = name;
 			this.aliveService = new AliveServiceManager();
+			this.parameters = this.aliveService.getParameters();
 		}
 
 		_createClass(Patient, [{
