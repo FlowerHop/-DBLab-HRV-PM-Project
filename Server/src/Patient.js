@@ -1,9 +1,8 @@
 let AliveServiceManager = require ('./HRVlib/AliveService');
 (function () {
 	class Patient {
-		constructor (id, name) {
+		constructor (id) {
             this.id = id;
-            this.name = name;
             this.aliveService = new AliveServiceManager ();
             this.parameters = this.aliveService.getParameters ();
 		}

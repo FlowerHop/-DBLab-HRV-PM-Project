@@ -13,7 +13,8 @@ var WebSocket = require('ws');
 var wss = new WebSocket.Server({ server: server });
 var AliveServiceManager = require('./HRVlib/AliveService');
 var StationarySensor = require('./StationarySensor');
-var routers = {};
+var Patient = require('./Patient');
+
 var patients = {};
 var stationarySensors = {};
 
@@ -41,6 +42,11 @@ var monitorRef = database.ref('monitor/');
 
 stationarySensorsRef.on('value', function (snapShot) {
   stationarySensorIDs = snapShot.val();
+  stationarySensorIDs.forEach(function (stationarySensorID) {
+    if (!stationarySensors[stationarySensorID.id]) {
+      stationarySensors[stationarySensorID.id] = new StationarySensor(stationarySensorID.id);
+    }
+  });
 });
 
 patientsRef.on('value', function (snapShot) {
@@ -48,10 +54,19 @@ patientsRef.on('value', function (snapShot) {
   snapShot.val().forEach(function (patient) {
     patientIDs.push(patient.id);
   });
+
+  patientIDs.forEach(function (patientID) {
+    if (!patients[patientID]) {
+      patients[patientID] = new Patient(patientID);
+    }
+  });
 });
 
 monitorRef.on('value', function (snapShot) {
   monitor = snapShot.val();
+  for (var k in monitor) {
+    stationarySensors[k].patient = patients[monitor[k]];
+  }
 });
 
 wss.on('connection', function (ws) {
@@ -137,6 +152,7 @@ app.post('/newStationarySensor/', function (req, res) {
   newMonitor[stationarySensorID] = 'Empty';
 
   database.ref('monitor/').update(newMonitor);
+  // new stationarySensor
   res.send();
 });
 
@@ -195,17 +211,17 @@ app.get('/getStationarySensorIDs', function (req, res) {
   res.send(JSON.stringify(stationarySensorIDs));
 });
 
-app.get('/getStationarySensors', function (req, res) {
-  res.send(JSON.stringify(stationarySensors));
-});
+// app.get ('/getStationarySensors', (req, res) => {
+//   res.send (JSON.stringify (stationarySensors));
+// })
 
 app.get('/getMonitor', function (req, res) {
   res.send(JSON.stringify(monitor));
 });
 
-app.get('/getPatients', function (req, res) {
-  res.send(JSON.stringify(patients));
-});
+// app.get ('/getPatients', (req, res) => {
+//   res.send (JSON.stringify (patients));
+// });
 
 app.get('/getPatientIDs', function (req, res) {
   res.send(JSON.stringify(patientIDs));
