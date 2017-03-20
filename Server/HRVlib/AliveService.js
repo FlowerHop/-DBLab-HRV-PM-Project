@@ -48,7 +48,6 @@ let HeartBeatManager = require ('./HeartBeat');
             // We have a packet of data from the heart monitor
             // this.mEcgView.onAlivePacket(this.sampleCount, this.hmPacket);
             // this.mAccView.onAlivePacket(this.sampleCount, this.hmPacket);
-
             // Process the ECG data
             var len = mBytesBuffer.length;
             // var tmp = new Int8Array(1); // in nodejs, it won't work
@@ -73,8 +72,8 @@ let HeartBeatManager = require ('./HeartBeat');
         stop () {
             // this.mSocket.close ();
         }, 
-        getParameters () {
-            return this.mHeartBeat.getResults ();
+        getHRV () {
+            return this.mHRDet.getHRV ();
         }
     };
 

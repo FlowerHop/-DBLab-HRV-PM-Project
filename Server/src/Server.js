@@ -77,10 +77,11 @@ wss.on ('connection', (ws) => {
     if (!message.match) {
       return;
     } 	
-  	let pattern = /id\/([\w|:]+)/;
+    console.log (message);
+  	let pattern = /id\/([\w|:|-]+)/;
   	let match = message.match (pattern);
   	match = match ? match[1] : undefined;
-
+    console.log (match);
   	if (match !== undefined) {
   	 match = match.match (/([^:]+):([^:]+)/);
   	  if (match) {
@@ -143,6 +144,11 @@ app.use ((req, res, next) => {
 app.get ('/helloWorld', (req, res) => {
   res.send ("HelloWorld");
   res.end ();
+});
+
+app.get ('/getParameters/:patientID', (req, res) => {
+  let patientID = req.params.patientID;
+  res.send (JSON.stringify (patients[patientID].getParameters ()));
 });
 
 app.post ('/newStationarySensor/', (req, res) => {

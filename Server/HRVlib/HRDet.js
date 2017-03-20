@@ -94,7 +94,8 @@ let HRV = require ('./HRV');
             // tmp *= 200;
             // tmp /= this.mADCUnit;
             // ecgSample = tmp;
-
+            this.mHRV.addECGSample (ecgSample);
+            // console.log (ecgSample);
             if (this.mSampleCount == 0) {
                 this.mQrsDet.init();
             }

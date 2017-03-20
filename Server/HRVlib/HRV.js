@@ -22,11 +22,17 @@
 	    this.cos = [];
 	    this.sin = [];
 	    this.FFTBuild (this.fftN);
+	    this.rawECGSamples = [];
+	    this.windowLength = 512;
+	    this.rrWindowLength = 512;
 	};
 
 	HRV.prototype = {
 		addRR (rr) {
-            this.RRs.push (rr);
+		  if (this.RRs.length >= this.rrWindowLengh) {
+			this.RRs.shift ();
+		  }
+          this.RRs.push (rr);
 		},
         getfftRRs () {
             return this.fftRRs;
@@ -315,6 +321,12 @@
 	                }
 	            }
 	        }
+		},
+		addECGSample (ecgSample) {
+		  if (this.rawECGSamples.length >= this.windowLength) {
+		  	this.rawECGSamples.shift ();
+		  } 
+          this.rawECGSamples.push (ecgSample);
 		}
 	};
 	module.exports = HRV;
