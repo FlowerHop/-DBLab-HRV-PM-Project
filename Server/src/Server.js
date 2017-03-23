@@ -151,6 +151,21 @@ app.get ('/getParameters/:patientID', (req, res) => {
   res.send (JSON.stringify (patients[patientID].getParameters ()));
 });
 
+app.get ('/getStatus/:patientID', (req, res) => {
+  let patientID = req.params.patientID;
+  res.send (new String (patients[patientID].getStatus ()));
+});
+
+app.get ('/getHR/:patientID', (req, res) => {
+  let patientID = req.params.patientID;
+  res.send (new String (patients[patientID].getHR ()));
+});
+
+app.get ('/getRawECGSamples/:patientID', (req, res) => {
+  let patientID = req.params.patientID;
+  res.send (JSON.stringify (patients[patientID].getRawECGSamples ()));
+});
+
 app.post ('/newStationarySensor/', (req, res) => {
   let stationarySensorID = req.body.stationarySensorID;
   database.ref ('stationarySensors/' + stationarySensorIDs.length).set ({
@@ -196,21 +211,21 @@ app.get ('/newStationarySensor/:id', (req, res) => {
   res.end ();
 });
 
-app.get ('/getParameters/:id', (req, res) => {
-  // for (let k in patients) {
-  //   let patient = patients[k];
-  //   if (patient.id == req.params.id) {
-  //     res.send (JSON.stringify (patient.getParameters ()));
-  //     return;
-  //   } 
-  // }
+// app.get ('/getParameters/:id', (req, res) => {
+//   // for (let k in patients) {
+//   //   let patient = patients[k];
+//   //   if (patient.id == req.params.id) {
+//   //     res.send (JSON.stringify (patient.getParameters ()));
+//   //     return;
+//   //   } 
+//   // }
 
-  // need to remove because stationarySensor don't care about parameter
-  let id = req.params.id;
-  if (stationarySensors[id]) {
-    res.send (JSON.stringify (stationarySensors[id].getParameters ()))
-  }
-});
+//   // need to remove because stationarySensor don't care about parameter
+//   let id = req.params.id;
+//   if (stationarySensors[id]) {
+//     res.send (JSON.stringify (stationarySensors[id].getParameters ()))
+//   }
+// });
 
 app.get ('/getStationarySensorIDs', (req, res) => {
   // let ids = [];

@@ -7,9 +7,43 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
 		}
 
 		inputBioSignals (bioSignals) {
-			var mBytesBuffer = new Int8Array (bioSignals);
+			let mBytesBuffer = new Int8Array (bioSignals);
 			this.aliveService.run (mBytesBuffer);
 		}
+        
+        getStatus () {
+            let hrv = this.aliveService.getHRV ();
+            let meanRR = 0;
+            let status = 0;
+
+            if (hrv.getMeanRR () != 0) {
+              meanRR = (1000*60.)/hrv.getMeanRR ();
+            }
+
+            if (hrv.getRRs ().length < 32) {
+              status = -1;
+            } else if (meanRR < 50) {
+              status = 1; // 心跳過緩(Bradycardia)
+			} else if (meanRR > 100) {
+              status = 1; // 心跳過速(Tachycardia)
+			} else if (hrv.isArr (32)) {
+              status = 2; // 心律不整(Irregular rhythm)
+			} else {
+			  status = 0; // 心律正常(Regular rhythm)
+			}
+
+			return status;
+        }
+        
+        getRawECGSamples () {
+        	let hrv = this.aliveService.getHRV ();
+        	return hrv.rawECGSamples;
+        }
+
+        getHR () {
+        	let hrv = this.aliveService.getHRV ();
+        	return hrv.HR;
+        }
 
 		getParameters () {
 			let hrv = this.aliveService.getHRV ();
@@ -21,28 +55,19 @@ let AliveServiceManager = require ('./HRVlib/AliveService');
             }
 
 			let parameters = {
-              rawECGSamples: hrv.rawECGSamples,
-              RRs: hrv.getRRs (),
-              meanRR: parseInt(meanRR*100+0.5)/(100.),
-              RMSSD: parseInt(hrv.getRMSSD ()*100+0.5)/(100.),
-              SDNN: parseInt(hrv.getSDNN ()*100+0.5)/(100.),
-              NN50: hrv.getNN50(),
-              pNN50: (parseInt(hrv.getpNN50()*10000+0.5)/100.),
+              meanRR: parseInt (meanRR*100+0.5)/(100.),
+              RMSSD: parseInt (hrv.getRMSSD ()*100+0.5)/(100.),
+              SDNN: parseInt (hrv.getSDNN ()*100+0.5)/(100.),
+              NN50: hrv.getNN50 (),
+              pNN50: (parseInt (hrv.getpNN50()*10000+0.5)/100.),
               TP: hrv.getTP (),
               LF: hrv.getLF (),
-              HF: hrv.getHF ()
+              HF: hrv.getHF (),
+              ratio: 0
 			};
 
-            if (hrv.getRRs ().length < 32) {
-              parameters.isArr = "偵測中";
-			} else if (meanRR < 50) {
-              parameters.isArr = "心跳過緩(Bradycardia)";
-			} else if (meanRR > 100) {
-              parameters.isArr = "心跳過速(Tachycardia)";
-			} else if (hrv.isArr (32)) {
-              parameters.isArr = "心律不整(Irregular rhythm)";
-			} else {
-              parameters.isArr = "心律正常(Regular rhythm)";
+			if (parameters.HF != 0) {
+			  parameters.ratio = parameters.LF/parameters.HF;
 			}
 
 			return parameters;

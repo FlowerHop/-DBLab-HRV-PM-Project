@@ -2,6 +2,7 @@
 
 (function () {
 	var HRV = function () {
+		this.HR = 0;
 		this.RRs = [];
 		this.fftRRs = [];
 		this.fftN = 256;

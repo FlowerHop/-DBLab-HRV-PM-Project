@@ -126,7 +126,19 @@
         },
         onAliveHeartBeat(timeSampleCount, hr, rrSamples, hrv) {
             // console.log(hr);
-            this.updateHeartRate (Math.floor(hr+0.5));
+            hr = Math.floor (hr + 0.5);
+            var hrString;
+            if (hr == 0) {
+                hrString = "---";
+            } else {
+                hrString = hr;
+            }
+
+            if(this.hrString != hrString) {
+                this.hrString = hrString;
+                hrv.HR = this.hrString;
+            }
+            // this.updateHeartRate (Math.floor(hr+0.5));
             this.updateRR (rrSamples, hrv);
         }
     };

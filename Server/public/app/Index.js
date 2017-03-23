@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import bootstrap from 'bootstrap';
 import Home from './Home';
 import DeviceManagement from './DeviceManagement';
+import Hemodialysis from './Hemodialysis';
 
 class Index extends Component {
 	  constructor (props) {
@@ -15,7 +16,7 @@ class Index extends Component {
         e.preventDefault()
         $(this).tab('show')
       });
-      $('#messages a').click(function (e) {
+      $('#hemodialysis a').click(function (e) {
         e.preventDefault()
         $(this).tab('show')
       });
@@ -32,13 +33,13 @@ class Index extends Component {
             <ul style={{backgroundColor: '#083D77', color: '#F8FFF4',}} className="nav nav-pills" role="tablist">
               <li className="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
               <li><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
-              <li><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
+              <li><a href="#hemodialysis" aria-controls="hemodialysis" role="tab" data-toggle="tab">Hemodialysis Center</a></li>
               <li><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Device Management</a></li>
             </ul>
             <div className="tab-content">
               <div role="tabpanel" className="tab-pane active" id="home"><Home/></div>
               <div role="tabpanel" className="tab-pane" id="profile">...</div>
-              <div role="tabpanel" className="tab-pane" id="messages">...</div>
+              <div role="tabpanel" className="tab-pane" id="hemodialysis"><Hemodialysis/></div>
               <div role="tabpanel" className="tab-pane" id="settings"><DeviceManagement/></div>
             </div>
 
