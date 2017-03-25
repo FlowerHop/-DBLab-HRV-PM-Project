@@ -25,15 +25,15 @@ class Hemodialysis extends Component {
     }
 
     loadingDataFromServer () {
-      // fetch (serverURL + 'getParameters/P-B')
-      // .then ((response) => response.json ())
-      // .then ((response) => {
-      //   console.log (response);
+      fetch (serverURL + 'getPatientIDs/')
+      .then ((response) => response.json ())
+      .then ((response) => {
+        this.setState ({patientIDs: response});
         
-      // })
-      // .catch ((err) => {
-      // 	console.log (err);
-      // });	
+      })
+      .catch ((err) => {
+      	console.log (err);
+      });	
     }
 
     render () {
@@ -42,7 +42,11 @@ class Hemodialysis extends Component {
       	  <div className="row">
       	    <div className="col-md-2"></div>
       	    <div className="col-md-8">
-      	      <ECGTable patientID="P-A"/>
+      	      {this.state.patientIDs.map ((patientID) => {
+                return (
+                  <ECGTable key={patientID} patientID={patientID}/>
+                );
+      	      })}
             </div>
       	    <div className="col-md-2"></div>
       	  </div>
@@ -417,6 +421,7 @@ class ECGTable extends Component {
 	  super (props);
 	  this.state = {
 	  	isStart: 0, // 0: stop, 1: start
+	  	info: {},
 	  	btnTxt: 'Start',
 	  	HR: '---',
         meanRR: 0,
@@ -473,6 +478,14 @@ class ECGTable extends Component {
 	  .catch ((err) => {
 	  	console.log (err);
 	  });	
+
+	  fetch (serverURL + 'getPatient/' + this.props.patientID)
+	  .then ((response) => response.json ())
+	  .then ((response) => {
+	  	this.setState ({
+          info: response
+	  	});
+	  });
 	}
 
 	render () {
@@ -480,7 +493,7 @@ class ECGTable extends Component {
 	  	<div> 
           <div className={(this.state.status == 0) ? "panel panel-info" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
             <div className="panel-heading">
-              <h3>Patient {this.props.patientID}
+              <h3>Patient {this.state.info.name}
                 <button className={this.state.isStart ? 'btn btn-danger pull-right' : 'btn btn-success pull-right'} ref='monitorButton' onClick={() => {
                   if (this.state.isStart) {
             	    // to stop
@@ -495,11 +508,39 @@ class ECGTable extends Component {
                 >{this.state.btnTxt}</button>
               </h3>
             </div>
+            
             <div className="panel-body">
-
-            </div>
-            <table className='table' style={{backgroundColor: 'white'}}>
+              <table className='table' style={{backgroundColor: 'white'}}>
     	  	  <tbody>
+    	  	    <tr>
+    	  	      <td>
+    	  	      	<div className="panel-group">
+    	  	      	  <div className={(this.state.status == 0) ? "panel panel-info" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+    	  	      	  	<div className="panel-heading">
+    	  	      	  	  <h4 className="panel-title">
+    	  	      	  	  	<a data-toggle="collapse" href={"#info" + this.props.patientID} aria-expanded="true" aria-controls="info">
+                          		病人基本資料
+                          	</a>
+    	  	      	  	  </h4>
+    	  	      	  	</div>
+    	  	      	  	<div id={"info" + this.props.patientID} className="panel-collapse collapse" aria-expanded="false" aria-labelledby="info">
+    	  	      	  	  <table className="table table-bordered" style={{backgroundColor: '#FFFFFF'}}>
+    	  	      	  	    <tbody>
+    	  	      	  	      <tr>
+    	  	      	  	      	<td>{"病人ID: "}<span className="pull-right">{this.props.patientID}</span></td>
+    	  	      	  	        <td>{"姓名: "}<span className="pull-right">{this.state.info.name}</span></td>
+    	  	      	  	      </tr>
+    	  	      	  	      <tr>
+    	  	      	  	      	<td>{"性別: "}<span className="pull-right">{this.state.info.gender}</span></td>
+    	  	      	  	      	<td>{"年齡: "}<span className="pull-right">{this.state.info.age}</span></td>
+    	  	      	  	      </tr>
+    	  	      	  	    </tbody>
+    	  	      	  	  </table>
+    	  	      	  	</div>
+    	  	      	  </div>
+    	  	      	</div>
+    	  	      </td>
+    	  	    </tr>
                 <tr>
                   <td>
                     <ECGGraph patientID={this.props.patientID}/>
@@ -508,7 +549,7 @@ class ECGTable extends Component {
                 <tr>
                   <td>
                     <div className="panel-group">
-                      <div className="panel panel-default">
+                      <div className={(this.state.status == 0) ? "panel panel-info" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
                         <div className="panel-heading">
                           <h4 className="panel-title">
                           	<a data-toggle="collapse" href={"#content" + this.props.patientID} aria-expanded="true" aria-controls="content">
@@ -571,7 +612,8 @@ class ECGTable extends Component {
                   </td>
                 </tr>
               </tbody>
-    	  	</table>
+    	  	  </table>
+            </div>
           </div>		  
 	  	</div>
 	  );

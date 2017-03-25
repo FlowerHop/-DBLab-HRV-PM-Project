@@ -53,9 +53,12 @@ patientsRef.on ('value', (snapShot) => {
     patientIDs.push (patient.id);
   });
 
-  patientIDs.forEach ((patientID) => {
+  patientIDs.forEach ((patientID, index) => {
     if (!patients[patientID]) {
       patients[patientID] = new Patient (patientID);
+      patients[patientID].name = snapShot.val ()[index].name;
+      patients[patientID].gender = snapShot.val ()[index].gender;
+      patients[patientID].age = snapShot.val ()[index].age;
     }
   });
 });
@@ -173,7 +176,7 @@ app.post ('/newStationarySensor/', (req, res) => {
   });
 
   let newMonitor = {};
-  newMonitor[stationarySensorID] = 'Empty';
+  newMonitor[stationarySensorID] = '無';
 
   database.ref ('monitor/').update (newMonitor);
   // new stationarySensor
@@ -249,6 +252,16 @@ app.get ('/getMonitor', (req, res) => {
 
 app.get ('/getPatientIDs', (req, res) => {
   res.send (JSON.stringify (patientIDs));
+});
+
+app.get ('/getPatient/:patientID', (req, res) => {
+  let patientID = req.params.patientID;
+  let result = {
+    name: patients[patientID].name,
+    gender: patients[patientID].gender,
+    age: patients[patientID].age
+  };
+  res.send (JSON.stringify (result));
 });
 
 server.listen (app.get ('port'), () => {
