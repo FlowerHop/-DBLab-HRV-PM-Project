@@ -85,25 +85,25 @@ wss.on('connection', function (ws) {
     match = match ? match[1] : undefined;
     console.log(match);
     if (match !== undefined) {
-      match = match.match(/([^:]+):([^:]+)/);
-      if (match) {
-        var id = match[1];
-        var port = match[2];
-        console.log('Receive a stationary sensor (' + id + ') port (' + port + ')');
+      // match = match.match (/([^:]+):([^:]+)/);
+      // if (match) {
+      var id = match;
+      // let port = match[2];
+      console.log('Receive a stationary sensor (' + id + ')');
 
-        ws.send('ok');
-        var stationarySensor = stationarySensors[id];
-        if (stationarySensor) {
-          switch (port) {
-            case 'A':
-              stationarySensor.initWS(ws, undefined);
-              break;
-            case 'B':
-              stationarySensor.initWS(undefined, ws);
-              break;
-          }
-        }
+      ws.send('ok');
+      var stationarySensor = stationarySensors[id];
+      if (stationarySensor) {
+        // switch (port) {
+        // case 'A':
+        stationarySensor.initWS(ws);
+        // break;
+        // case 'B':
+        // stationarySensor.initWS (undefined, ws);
+        // break;
+        // }
       }
+      // }
       // // routers[id] = ws; new Stationary sensor
       // ws.send ('ok');
       //  let service = new AliveServiceManager ();
@@ -146,6 +146,30 @@ app.get('/helloWorld', function (req, res) {
   res.end();
 });
 
+app.get('/test/start/:stationarySensorID', function (req, res) {
+  var stationarySensorID = req.params.stationarySensorID;
+  stationarySensors[stationarySensorID].start();
+  res.send();
+});
+
+app.get('/getStationarySensorStatus/:stationarySensorID', function (req, res) {
+  var stationarySensorID = req.params.stationarySensorID;
+  res.send(stationarySensors[stationarySensorID].isStart);
+});
+
+app.get('/updateStationarySensorStatus/:stationarySensorID/:status', function (req, res) {
+  var stationarySensorID = req.params.stationarySensorID;
+  var status = req.params.status == 'true';
+
+  if (status) {
+    stationarySensors[stationarySensorID].start();
+  } else {
+    stationarySensors[stationarySensorID].stop();
+  }
+
+  res.send();
+});
+
 app.get('/getParameters/:patientID', function (req, res) {
   var patientID = req.params.patientID;
   res.send(JSON.stringify(patients[patientID].getParameters()));
@@ -173,7 +197,7 @@ app.post('/newStationarySensor/', function (req, res) {
   });
 
   var newMonitor = {};
-  newMonitor[stationarySensorID] = 'Empty';
+  newMonitor[stationarySensorID] = '無';
 
   database.ref('monitor/').update(newMonitor);
   // new stationarySensor
@@ -182,6 +206,11 @@ app.post('/newStationarySensor/', function (req, res) {
 
 app.post('/updateMonitor/', function (req, res) {
   var newMonitor = req.body;
+
+  // if change, stop it then update
+  for (var k in newMonitor) {
+    stationarySensors[k].stop();
+  }
 
   database.ref('monitor/').update(newMonitor);
   res.send();

@@ -14,6 +14,7 @@ var Patient = require('./Patient');
       this.id = id;
       this.ws;
       this.patient = patient;
+      this.isStart = false;
       // this.wss = new Array (2);
       // this.patients = [arguments[1] ? new Patient (arguments[1].id, arguments[1].name) : arguments[0], 
       // arguments[2] ? new Patient (arguments[2].id, arguments[2].name) : arguments[1]];
@@ -54,7 +55,32 @@ var Patient = require('./Patient');
 
         this.ws.on('close', function () {
           _this.ws = undefined;
+          _this.isStart = false;
         });
+      }
+    }, {
+      key: 'start',
+      value: function start() {
+        if (this.ws) {
+          if (this.isStart) {
+            // console.log ('It has been activated.');
+          } else {
+            this.isStart = true;
+            this.ws.send('start');
+          }
+        }
+      }
+    }, {
+      key: 'stop',
+      value: function stop() {
+        if (this.ws) {
+          if (!this.isStart) {
+            // console.log ('It has been shut down.');
+          } else {
+            this.isStart = false;
+            this.ws.send('stop');
+          }
+        }
       }
 
       // getParameters () {

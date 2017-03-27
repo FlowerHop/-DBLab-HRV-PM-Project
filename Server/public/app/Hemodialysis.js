@@ -10,6 +10,7 @@ class Hemodialysis extends Component {
     constructor (props) {
       super (props);
       this.state = {
+      	stationarySensorIDs: [],
         patientIDs: []
       };
       this.loadingDataFromServer = this.loadingDataFromServer.bind (this);
@@ -25,15 +26,37 @@ class Hemodialysis extends Component {
     }
 
     loadingDataFromServer () {
-      fetch (serverURL + 'getPatientIDs/')
+      // fetch (serverURL + 'getPatientIDs/')
+      // .then ((response) => response.json ())
+      // .then ((response) => {
+      //   this.setState ({patientIDs: response});
+      // })
+      // .catch ((err) => {
+      // 	console.log (err);
+      // });	
+
+      fetch (serverURL + 'getMonitor')
       .then ((response) => response.json ())
       .then ((response) => {
-        this.setState ({patientIDs: response});
-        
+        this.setState ({monitor: response});
+        let stationarySensorIDs = [];
+        let patientIDs = [];
+
+        for (let k in response) {
+          if (response[k] != '無') {
+          	stationarySensorIDs.push (k);
+            patientIDs.push (response[k]);
+          }
+        }
+
+        this.setState ({
+          stationarySensorIDs: stationarySensorIDs,
+          patientIDs: patientIDs
+        });
       })
       .catch ((err) => {
       	console.log (err);
-      });	
+      });
     }
 
     render () {
@@ -42,9 +65,9 @@ class Hemodialysis extends Component {
       	  <div className="row">
       	    <div className="col-md-2"></div>
       	    <div className="col-md-8">
-      	      {this.state.patientIDs.map ((patientID) => {
+      	      {this.state.patientIDs.map ((patientID, index) => {
                 return (
-                  <ECGTable key={patientID} patientID={patientID}/>
+                  <ECGTable key={patientID} patientID={patientID} stationarySensorID={this.state.stationarySensorIDs[index]}/>
                 );
       	      })}
             </div>
@@ -420,9 +443,8 @@ class ECGTable extends Component {
 	constructor (props) {
 	  super (props);
 	  this.state = {
-	  	isStart: 0, // 0: stop, 1: start
+	  	isStart: false, // 0: stop, 1: start
 	  	info: {},
-	  	btnTxt: 'Start',
 	  	HR: '---',
         meanRR: 0,
         RMSSD: 0,
@@ -486,26 +508,37 @@ class ECGTable extends Component {
           info: response
 	  	});
 	  });
+
+	  fetch (serverURL + 'getStationarySensorStatus/' + this.props.stationarySensorID)
+	  .then ((response) => response.json ())
+	  .then ((response) => {
+	    this.setState ({
+	      isStart: response
+	    });  	
+	  });
 	}
 
 	render () {
 	  return (
 	  	<div> 
-          <div className={(this.state.status == 0) ? "panel panel-info" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+          <div className={(this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
             <div className="panel-heading">
               <h3>Patient {this.state.info.name}
                 <button className={this.state.isStart ? 'btn btn-danger pull-right' : 'btn btn-success pull-right'} ref='monitorButton' onClick={() => {
                   if (this.state.isStart) {
             	    // to stop
-                    this.setState ({isStart: 0});
-                    this.setState ({btnTxt: 'Start'});
+            	    fetch (serverURL + 'updateStationarySensorStatus/' + this.props.stationarySensorID + '/false')
+            	    .catch ((err) => {
+            	      console.log (err);
+            	    });
                   } else {
                     // to start
-                    this.setState ({isStart: 1});
-                    this.setState ({btnTxt: 'Stop'});
+                    fetch (serverURL + 'updateStationarySensorStatus/' + this.props.stationarySensorID + '/true')
+            	    .catch ((err) => {
+            	      console.log (err);
+            	    });
                   }
-                  }}
-                >{this.state.btnTxt}</button>
+                }}>{this.state.isStart ? 'Stop' : 'Start'}</button>
               </h3>
             </div>
             
@@ -515,7 +548,7 @@ class ECGTable extends Component {
     	  	    <tr>
     	  	      <td>
     	  	      	<div className="panel-group">
-    	  	      	  <div className={(this.state.status == 0) ? "panel panel-info" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+    	  	      	  <div className={(this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
     	  	      	  	<div className="panel-heading">
     	  	      	  	  <h4 className="panel-title">
     	  	      	  	  	<a data-toggle="collapse" href={"#info" + this.props.patientID} aria-expanded="true" aria-controls="info">
@@ -549,7 +582,7 @@ class ECGTable extends Component {
                 <tr>
                   <td>
                     <div className="panel-group">
-                      <div className={(this.state.status == 0) ? "panel panel-info" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+                      <div className={(this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
                         <div className="panel-heading">
                           <h4 className="panel-title">
                           	<a data-toggle="collapse" href={"#content" + this.props.patientID} aria-expanded="true" aria-controls="content">

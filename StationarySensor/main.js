@@ -5,11 +5,9 @@ var WebSocket = require('ws');
 
 var serialportNum = process.argv[2];
 var id = process.argv[3];
-var option = process.argv[4];
 
-var wsA = void 0;
-var wsB = void 0;
-
+var ws = void 0;
+var isStart = false;
 // let serial = new serialport ('/dev/ttyACM' + serialportNum, {baudrate: 9600});
 var serial = new serialport('/dev/cu.usbmodem1421', { baudRate: 9600 });
 
@@ -20,50 +18,54 @@ serial.on('open', function (err) {
   }
 });
 
-switch (option) {
-  case 'A':
-    initWS(wsA, 'A');
-    break;
-  case 'B':
-    initWS(wsB, 'B');
-    break;
-  case 'Both':
-    initWS(wsA, 'A');
-    initWS(wsB, 'B');
-    break;
+ws = new WebSocket('ws://localhost:1338', {
+  perMessageDeflate: false
+});
+
+ws.on('open', function () {
+  console.log('connection');
+  ws.send('id/' + id);
+});
+
+ws.on('message', handleInit);
+
+function handleInit(message) {
+  // console.log ('handleInit: ' + message);
+  if (message == 'ok') {
+    ws.removeEventListener('message', handleInit);
+    ws.on('message', atMode);
+  }
+};
+
+function atMode(cmd) {
+  if (cmd == 'start') {
+    // console.log ('receive start');
+    isStart = true;
+  } else if (cmd == 'stop') {
+    // console.log ('receive stop');
+    isStart = false;
+  }
 }
 
-function initWS(ws, num) {
-  ws = new WebSocket('ws://localhost:1338', {
-    perMessageDeflate: false
-  });
+serial.on('data', function (data) {
+  if (isStart) {
+    var d = data.toString('utf-8');
+    var results = d.match(/(\[[^\[|^\]]+\])/g);
+    var packet = [];
 
-  ws.on('open', function () {
-    console.log('connection');
-    ws.send('id/' + id + ':' + num);
-  });
-
-  ws.on('message', function (message) {
-    if (message == 'ok') {
-      console.log('start transform');
-      serial.on('data', function (data) {
-        var d = data.toString('utf-8');
-        var results = d.match(/(\[[^\[|^\]]+\])/g);
-        var packet = [];
-        for (var i in results) {
-          var result = results[i].match(/\[([^\[|^\]]+)\]/)[1];
-          if (result !== 'e') {
-            packet.push((result - 3300 / 10000) / 10);
-          }
-        }
-        if (packet.length != 0) {
-          ws.send(packet);
-        }
-      });
+    for (var i in results) {
+      var result = results[i].match(/\[([^\[|^\]]+)\]/)[1];
+      if (result !== 'e') {
+        packet.push((result - 3300 / 10000) / 10);
+      }
     }
-  });
 
-  ws.on('close', function () {
-    console.log('close');
-  });
-}
+    if (packet.length != 0) {
+      ws.send(packet);
+    }
+  }
+});
+
+ws.on('close', function () {
+  console.log('close');
+});

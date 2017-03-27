@@ -3,11 +3,9 @@ const WebSocket = require ('ws');
 
 let serialportNum = process.argv[2];
 let id = process.argv[3];
-let option = process.argv[4];
 
-let wsA;
-let wsB;
-
+let ws;
+let isStart = false;
 // let serial = new serialport ('/dev/ttyACM' + serialportNum, {baudrate: 9600});
 let serial = new serialport ('/dev/cu.usbmodem1421', {baudRate: 9600});
 
@@ -18,53 +16,59 @@ serial.on ('open', (err) => {
   }
 }); 
 
-switch (option) {
-  case 'A':
-    initWS (wsA, 'A');
-    break;
-  case 'B':
-    initWS (wsB, 'B');
-    break;
-  case 'Both':    
-    initWS (wsA, 'A');
-    initWS (wsB, 'B');
-    break;
+ws = new WebSocket ('ws://localhost:1338', {
+  perMessageDeflate: false
+});
+
+ws.on ('open', () => {
+  console.log ('connection');
+  ws.send ('id/' + id);
+});
+
+ws.on ('message', handleInit);
+
+function handleInit (message) {
+  // console.log ('handleInit: ' + message);
+  if (message == 'ok') {
+    ws.removeEventListener ('message', handleInit);
+    ws.on ('message', atMode);
+  }
+}; 
+
+function atMode (cmd) {
+  if (cmd == 'start') {
+    // console.log ('receive start');
+    isStart = true;
+  } else if (cmd == 'stop') {
+    // console.log ('receive stop');
+    isStart = false;
+  }
 }
 
-function initWS (ws, num) {
-  ws = new WebSocket ('ws://localhost:1338', {
-    perMessageDeflate: false
-  });
 
-  ws.on ('open', () => {
-    console.log ('connection');
-    ws.send ('id/' + id + ':' + num);
-  });
+serial.on ('data', (data) => {
+  if (isStart) {
+    let d = data.toString ('utf-8');
+    let results = d.match (/(\[[^\[|^\]]+\])/g);
+    let packet = [];
+    
+    for (let i in results) {
+      let result = results[i].match (/\[([^\[|^\]]+)\]/)[1];
+      if (result !== 'e') {
+        packet.push ((result - 3300/10000)/10);
+      }
+    } 
 
-  ws.on ('message', (message) => {
-    if (message == 'ok') {
-      console.log ('start transform');
-      serial.on ('data', (data) => {
-        let d = data.toString ('utf-8');
-        let results = d.match (/(\[[^\[|^\]]+\])/g);
-        let packet = [];
-        for (let i in results) {
-          let result = results[i].match (/\[([^\[|^\]]+)\]/)[1];
-          if (result !== 'e') {
-            packet.push ((result - 3300/10000)/10);
-          }
-        } 
-        if (packet.length != 0) {
-          ws.send (packet);
-        }
-      });
+    if (packet.length != 0) {
+      ws.send (packet);
     }
-  });
+  }
+});
 
-  ws.on ('close', function () {
-    console.log ('close');
-  });
-}
+ws.on ('close', function () {
+  console.log ('close');
+});
+
 
 
 
