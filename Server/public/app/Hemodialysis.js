@@ -184,6 +184,7 @@ class ECGView extends Component {
       this.contextView = "";
 
       this.rawECGSamples = [];
+      this.sampleCount = 0;
 
       this.getECGRangeHeight = this.getECGRangeHeight.bind (this);
       this.onMeasure = this.onMeasure.bind (this);
@@ -207,7 +208,7 @@ class ECGView extends Component {
     	window.addEventListener ('resize', this.onMeasure, false);
     	this.onMeasure ();
     	this.loadingDataFromServer ();
-    	this.loadingInterval = setInterval (this.loadingDataFromServer, 100);
+    	this.loadingInterval = setInterval (this.loadingDataFromServer, 200);
     }
 
     getECGRangeHeight () {
@@ -319,14 +320,14 @@ class ECGView extends Component {
                 this.mEcgFilter = new MainsFilterManager ();
                 this.mInitalized = true;
             }
-            
-            for (let i = 0; i < len; i++) {
-                let val = packet[i];
-                val = this.mEcgFilter.filter (-val);
-                this.mEcgBuffer.add (val);
-                this.rawECGSamples[index++] = packet[i];
-            }
+            // console.log (index + 'new: ' + packet);
 
+            for (let i = 0; i < len; i++) {
+                let val = packet[i].data;
+                val = this.mEcgFilter.filter (val);
+                this.mEcgBuffer.add (val);
+                this.sampleCount = packet[i].sampleCount;
+            }
             this.onMeasure ();
             this.onDraw ();
         }
@@ -342,15 +343,12 @@ class ECGView extends Component {
       .then ((response) => response.json ())
       .then ((response) => {
       	let rawECGSamples = response;
-      	for (let i = 0; i < rawECGSamples.length; i++) {
-      	  if (i < this.rawECGSamples.length) {
-            if (rawECGSamples[i] != this.rawECGSamples[i]) {
-              this.onAlivePacket (i, rawECGSamples.slice (i, rawECGSamples.length));
-            }
-      	  } else {
-            this.onAlivePacket (i, rawECGSamples.slice (i, rawECGSamples.length));
-      	  }
-      	}
+
+        for (let i = 0; i < rawECGSamples.length; i++) {
+          if (rawECGSamples[i].sampleCount > this.sampleCount) {
+            this.onAlivePacket (0, rawECGSamples.slice (i, rawECGSamples.length));
+          }
+        }
       });
     }
 

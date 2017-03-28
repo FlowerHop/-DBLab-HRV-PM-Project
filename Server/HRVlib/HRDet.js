@@ -101,7 +101,7 @@ let HRV = require ('./HRV');
             }
 
             // Pass ECG sample to beat detector
-            delay = this.mQrsDet.process(ecgSample);
+            delay = this.mQrsDet.process(ecgSample.data);
             // Beat was detected
             if (delay != 0) {
                 this.mCurrQRSSample = this.mSampleCount - delay;

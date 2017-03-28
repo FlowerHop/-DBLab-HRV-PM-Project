@@ -54,7 +54,8 @@ let HeartBeatManager = require ('./HeartBeat');
             // tmp[0] = 0xFF;
             for(var i = 0; i < len; i++) {
                 // var nDatum = (buffer[startIndex+i] & tmp);
-                var nDelay = this.mHRDet.process(mBytesBuffer[i]);
+                var nDelay = this.mHRDet.process({data: mBytesBuffer[i], sampleCount: this.sampleCount});
+                this.sampleCount++;
                 if(nDelay!=0) {
                     // Update the heart-rate in the UI
                     // console.log("Update the heart rate");
@@ -66,7 +67,7 @@ let HeartBeatManager = require ('./HeartBeat');
                     );
                 }
             }
-            this.sampleCount += len;
+            // this.sampleCount += len;
             // console.log("sampleCount = " + this.sampleCount);            
         }, 
         stop () {

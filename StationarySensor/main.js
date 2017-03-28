@@ -39,10 +39,10 @@ function handleInit(message) {
 
 function atMode(cmd) {
   if (cmd == 'start') {
-    // console.log ('receive start');
+    console.log('receive start');
     isStart = true;
   } else if (cmd == 'stop') {
-    // console.log ('receive stop');
+    console.log('receive stop');
     isStart = false;
   }
 }
