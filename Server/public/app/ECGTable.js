@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ECGGraph from './ECGGraph';
 
-let serverURL = "http://localhost:1338/";
+// let serverURL = "http://localhost:1338/";
+let serverURL = "http://140.115.51.30:1338/";
 
 class ECGTable extends Component {
 	constructor (props) {
@@ -94,9 +95,9 @@ class ECGTable extends Component {
 	render () {
 	  return (
 	  	<div> 
-          <div className={(this.state.isStart ? ((this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-info"))) : "panel panel-default")}>
+        <div id={"table" + this.props.patientID} className={(this.state.isStart ? ((this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-info"))) : "panel panel-default")}>
             <div className="panel-heading">
-              <h3>病人 {this.state.info.name}
+              <h3>病人 <u>{this.state.info.name}</u>
 
                 <button className={this.state.isStart ? 'btn btn-danger pull-right' : 'btn btn-success pull-right'} ref='monitorButton' onClick={() => {
                   if (this.state.isStart) {
@@ -122,7 +123,7 @@ class ECGTable extends Component {
             
             <div className="panel-body">
               <table className='table' style={{backgroundColor: 'white'}}>
-    	  	  <tbody>
+    	  	      <tbody>
     	  	    <tr>
     	  	      <td>
     	  	      	<div className="panel-group">
@@ -223,9 +224,9 @@ class ECGTable extends Component {
                   </td>
                 </tr>
               </tbody>
-    	  	  </table>
+    	  	    </table>
             </div>
-          </div>		  
+        </div>		  
 	  	</div>
 	  );
 	}

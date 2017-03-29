@@ -2,14 +2,17 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ECGTable from './ECGTable';
 
-let serverURL = "http://localhost:1338/";
+// let serverURL = "http://localhost:1338/";
+let serverURL = "http://140.115.51.30:1338";
 
 class Hemodialysis extends Component {
     constructor (props) {
       super (props);
       this.state = {
       	stationarySensorIDs: [],
-        patientIDs: []
+        patientIDs: [], 
+        patientNames: {},
+        patientStatuses: {}
       };
       this.loadingDataFromServer = this.loadingDataFromServer.bind (this);
     }
@@ -55,13 +58,52 @@ class Hemodialysis extends Component {
       .catch ((err) => {
       	console.log (err);
       });
+
+      this.state.patientIDs.forEach ((patientID) => {
+        fetch (serverURL + 'getPatient/' + patientID)
+        .then ((response) => response.json ())
+        .then ((response) => {
+          this.state.patientNames[patientID] = response.name;
+        })
+        .catch ((err) => {
+          console.log (err);
+        });
+
+        fetch (serverURL + 'getStatus/' + patientID)
+        .then ((response) => response.json ())
+        .then ((response) => {
+          this.state.patientStatuses[patientID] = response;
+        })
+        .catch ((err) => {
+          console.log (err);
+        });
+      });
     }
 
     render () {
       return (
       	<div style={{marginTop: '40px'}}>
       	  <div className="row">
-      	    <div className="col-md-2"></div>
+            <div className="col-md-1"></div>
+      	    <div className="col-md-2">
+              <div className="panel panel-primary affix">
+                <div className="panel-heading">
+                  病人名單
+                </div>
+                <div className="panel-body">
+                  <ul className="nav nav-sidebar">
+                    {this.state.patientIDs.map ((patientID) => {
+                      return (
+                        <li key={patientID} className={
+                          (this.state.patientStatuses[patientID] == 1) ? "list-group-item-warning" : ((this.state.patientStatuses[patientID] == 2) ? "list-group-item-danger" : "")}>
+                          <a href={"#table" + patientID}>{this.state.patientNames[patientID]}</a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
       	    <div className="col-md-8">
       	      {this.state.patientIDs.map ((patientID, index) => {
                 return (
@@ -69,7 +111,7 @@ class Hemodialysis extends Component {
                 );
       	      })}
             </div>
-      	    <div className="col-md-2"></div>
+            <div className="col-md-1"></div>
       	  </div>
       	</div>
       );

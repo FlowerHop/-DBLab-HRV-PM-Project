@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import bootstrap from 'bootstrap';
+// import bootstrap from 'bootstrap';
 
 let patientIDs = [];
 let patientNames = {};
@@ -9,28 +9,65 @@ class DeviceManagement extends Component {
     constructor (props) {
       super (props);
       this.state = {
-      
+        stationarySensorIDs: []
       };
+      this.loadingDataFromServer = this.loadingDataFromServer.bind (this);
     }
    
-    componentDidMount () {
+    loadingDataFromServer () {
+      fetch (serverURL + 'getStationarySensorIDs/')
+      .then ((response) => response.json ())
+      .then ((response) => {
+        let stationarySensorIDs = [];
+        response.forEach ((stationarySensor) => {
+          stationarySensorIDs.push (stationarySensor.id);
+        });
+        this.setState ({stationarySensorIDs: stationarySensorIDs});      
+      })
+      .catch ((err) => {
+        console.log (err);
+      });
+    }
 
+    componentDidMount () {
+      this.loadingDataFromServer ();
+      this.loadingInterval = setInterval (this.loadingDataFromServer, 2000);
     }
 
     componentWillUnmount () {
-
+      clearInterval (this.loadingInterval);
     }
 
     render () {
       return (
-        <div className="row" style={{marginTop: '40px'}}>
-
-          <div className="col-md-2"></div>
-          <div className="col-md-8 center-block">
-            <StationaryTable/>
+        <div style={{marginTop: '40px'}}>
+          <div className="row">
+            <div className="col-md-1"></div>
+            <div className="col-md-2">
+              <div className="panel panel-primary">
+                <div className="panel-heading">
+                  床位
+                </div>
+                <div className="panel-body">
+                  <ul className="nav nav-sidebar">
+                    {this.state.stationarySensorIDs.map ((stationarySensorID, index) => {
+                      return (
+                        <li key={stationarySensorID}>
+                          <a href={"#table" + stationarySensorID}>{"床位 " + (index + 1)}</a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-8 center-block">
+              <StationaryTable/>
+            </div>
+            <div className="col-md-1"></div>
           </div>
-          <div className="col-md-2"></div>
         </div>
+        
       );
     }
 }
@@ -179,10 +216,10 @@ class StationaryTable extends Component {
                 if (index % 2 != 0) {
                   return (
                     <tr key={"row" + (index/2)}>
-                      <td className="row">
+                      <td className="row" id={"table" + stationarySensorIDs[index - 1]}>
                         <div className="col-md-6">
                           <img src="app/res/img/bed_left.png"></img>
-                          <h3>{"Bed " + (index - 1 + 1)}</h3>
+                          <h3>{"床位 " + (index - 1 + 1)}</h3>
                         </div>
                         <div className="col-md-6" style={{top: '35px', color: '#083D77'}}>
                           <h3>監測病人ID</h3>
@@ -208,10 +245,10 @@ class StationaryTable extends Component {
                         </div>
                         
                       </td>
-                      <td className="row">
+                      <td className="row" id={"table" + stationarySensorIDs[index]}>
                         <div className="col-md-6">
                           <img src="app/res/img/bed_right.png"></img>
-                          <h3>{"Bed " + (index + 1)}</h3>
+                          <h3>{"床位 " + (index + 1)}</h3>
                         </div>
                         <div className="col-md-6" style={{top: '35px', color: '#083D77'}}>
                           <h3>監測病人ID</h3>
@@ -242,10 +279,10 @@ class StationaryTable extends Component {
                 } else if (index == stationarySensorIDs.length - 1) {
                   return (
                     <tr key={"row" + (index/2)}>
-                      <td className="row">
+                      <td className="row" id={"table" + stationarySensorIDs[index]}>
                         <div className="col-md-6"> 
                           <img src="app/res/img/bed_left.png"></img>
-                          <h3>{"Bed " + (index + 1)}</h3>
+                          <h3>{"床位 " + (index + 1)}</h3>
                         </div>
                         <div className="col-md-6" style={{top: '35px', color: '#083D77'}}>
                           <h3>監測病人ID</h3>

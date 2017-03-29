@@ -79,51 +79,20 @@ wss.on('connection', function (ws) {
     if (!message.match) {
       return;
     }
-    console.log(message);
     var pattern = /id\/([\w|:|-]+)/;
     var match = message.match(pattern);
     match = match ? match[1] : undefined;
-    console.log(match);
     if (match !== undefined) {
-      // match = match.match (/([^:]+):([^:]+)/);
-      // if (match) {
       var id = match;
-      // let port = match[2];
       console.log('Receive a stationary sensor (' + id + ')');
 
       ws.send('ok');
       var stationarySensor = stationarySensors[id];
       if (stationarySensor) {
-        // switch (port) {
-        // case 'A':
         stationarySensor.initWS(ws);
-        // break;
-        // case 'B':
-        // stationarySensor.initWS (undefined, ws);
-        // break;
-        // }
       }
-      // }
-      // // routers[id] = ws; new Stationary sensor
-      // ws.send ('ok');
-      //  let service = new AliveServiceManager ();
-      // ws.on ('message', (message) => {
-      //    for (let i = 0; i < message.length; i++) {
-      //        service.run(message[i]);    
-      //    }
-      // });
     }
   });
-
-  // ws.on ('close', () => {
-  // 	for (var i in routers) {
-  // 		if (routers[i] == ws) {
-  //             console.log (i + ' close');
-  // 			delete routers[i];
-  // 			return;
-  // 		}
-  // 	}
-  // });
 });
 
 app.set('port', process.env.PORT || 1338);
