@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import bootstrap from 'bootstrap';
 
-let patientIDs = ['A12', 'B33', 'C31'];
+let patientIDs = [];
+let patientNames = {};
 let serverURL = 'http://localhost:1338/';
 class DeviceManagement extends Component {
     constructor (props) {
@@ -22,11 +23,10 @@ class DeviceManagement extends Component {
 
     render () {
       return (
-        <div className="row">
+        <div className="row" style={{marginTop: '40px'}}>
 
           <div className="col-md-2"></div>
           <div className="col-md-8 center-block">
-            <h2>Device Management</h2> 
             <StationaryTable/>
           </div>
           <div className="col-md-2"></div>
@@ -41,9 +41,6 @@ class StationaryTable extends Component {
       this.state = {
         stationarySensorIDs: [],
         monitor: {
-        	a: 'B33', 
-        	b: '無',
-        	c: '無'
         },
         stationarySensorIDInput: ''
       };
@@ -81,13 +78,37 @@ class StationaryTable extends Component {
         console.log (err);
       });
 
+      
       fetch (serverURL + 'getMonitor')
       .then ((response) => response.json ())
       .then ((response) => {
         this.setState ({monitor: response});
+        // let monitor = {};
+        // for (let k in response) {
+        //   let patientID = response[k];
+
+        //   if (patientID != '無') {
+        //     fetch (serverURL + 'getPatient/' + patientID)
+        //     .then ((res) => res.json ())
+        //     .then ((res) => {
+        //       monitor[k] = {patientID: patientID, patientName: res};
+        //     });
+        //   } else {
+        //     monitor[k] = {patientID: patientID, patientName: '無'};
+        //   }
+        // }
+        // this.setState ({monitor: monitor});
       })
       .catch ((err) => {
         console.log (err);
+      });
+
+      patientIDs.forEach ((patientID) => {
+        fetch (serverURL + 'getPatient/' + patientID)
+        .then ((response) => response.json ())
+        .then ((response) => {
+          patientNames[patientID] = response.name;
+        });
       });
     }
  
@@ -148,6 +169,10 @@ class StationaryTable extends Component {
       let row = -1;
       return (
         <div>
+          <h2>床位配對</h2>
+          <p className="lead">
+            病人的姓名配對到正確的床位
+          </p> 
           <table className="table table-bordered" style={{backgroundColor: '#FFFFFF', textAlign:"center"}}>
             <tbody>
               {this.state.stationarySensorIDs.map ((stationarySensorID, index, stationarySensorIDs) => {
@@ -163,7 +188,7 @@ class StationaryTable extends Component {
                           <h3>監測病人ID</h3>
                           <div className="dropdown">
                           <h3 href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {this.state.monitor[stationarySensorIDs[index - 1]]}
+                            {(this.state.monitor[stationarySensorIDs[index - 1]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index - 1]]]}
                             <span className="caret"></span>
                           </h3>
                           <ul className="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -175,7 +200,7 @@ class StationaryTable extends Component {
                                 }
                               }
                               return (
-                                <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], patientID)}}>{patientID}</li>
+                                <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], patientID)}}>{patientNames[patientID]}</li>
                               );
                             })}
                           </ul>
@@ -192,7 +217,7 @@ class StationaryTable extends Component {
                           <h3>監測病人ID</h3>
                           <div className="dropdown">
                             <h3 href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {this.state.monitor[stationarySensorIDs[index]]}
+                              {(this.state.monitor[stationarySensorIDs[index]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index]]]}
                               <span className="caret"></span>
                             </h3>
                             <ul className="dropdown-menu text-center" role="menu" aria-labelledby="dLabel">
@@ -204,7 +229,7 @@ class StationaryTable extends Component {
                                   }
                                 }
                                 return (
-                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index], patientID)}}>{patientID}</li>
+                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index], patientID)}}>{patientNames[patientID]}</li>
                                 );
                               })}
                             </ul>
@@ -226,7 +251,7 @@ class StationaryTable extends Component {
                           <h3>監測病人ID</h3>
                           <div className="dropdown">
                             <h3 href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {this.state.monitor[stationarySensorIDs[index]]}
+                              {(this.state.monitor[stationarySensorIDs[index]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index]]]}
                               <span className="caret"></span>
                             </h3>
                             <ul className="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -238,7 +263,7 @@ class StationaryTable extends Component {
                                   }
                                 }
                                 return (
-                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[i], patientID)}}>{patientID}</li>
+                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[i], patientID)}}>{patientNames[patientID]}</li>
                                 );
                               })}
                             </ul>

@@ -7,8 +7,12 @@ class Home extends Component {
 	}
     render () {
       return (
-        <div>
-          Home
+        <div className="row" style={{marginTop: '40px'}}>
+          <div className="col-md-2"></div>
+          <div className="col-md-8">
+            <h1>Hi, 王小明 醫生</h1>
+          </div>
+          <div className="col-md-2"></div>
         </div>
       );
     }

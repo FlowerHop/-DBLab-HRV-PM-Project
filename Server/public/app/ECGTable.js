@@ -10,17 +10,17 @@ class ECGTable extends Component {
 	  this.state = {
 	  	isStart: false, // 0: stop, 1: start
 	  	info: {},
-	  	HR: '---',
-        meanRR: 0,
-        RMSSD: 0,
-        SDNN: 0,
-        NN50: 0,
-        pNN50: 0,
-        TP: 0,
-        LF: 0,
-        HF: 0,
-        ratio: 0,
-        status: 0
+	  	hr: '---',
+      meanRR: 0,
+      RMSSD: 0,
+      SDNN: 0,
+      NN50: 0,
+      pNN50: 0,
+      TP: 0,
+      LF: 0,
+      HF: 0,
+      ratio: 0,
+      status: 0
 	  };
 
 	  this.loadingDataFromServer = this.loadingDataFromServer.bind (this);
@@ -81,29 +81,42 @@ class ECGTable extends Component {
 	      isStart: response
 	    });  	
 	  });
+
+    fetch (serverURL + 'getHR/' + this.props.patientID)
+    .then ((response) => response.json ())
+    .then ((response) => {
+      this.setState ({
+        hr: response
+      });
+    });
 	}
 
 	render () {
 	  return (
 	  	<div> 
-          <div className={(this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+          <div className={(this.state.isStart ? ((this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-info"))) : "panel panel-default")}>
             <div className="panel-heading">
-              <h3>Patient {this.state.info.name}
+              <h3>病人 {this.state.info.name}
+
                 <button className={this.state.isStart ? 'btn btn-danger pull-right' : 'btn btn-success pull-right'} ref='monitorButton' onClick={() => {
                   if (this.state.isStart) {
-            	    // to stop
-            	    fetch (serverURL + 'updateStationarySensorStatus/' + this.props.stationarySensorID + '/false')
-            	    .catch ((err) => {
-            	      console.log (err);
-            	    });
+            	      // to stop
+                    fetch (serverURL + 'updateStationarySensorStatus/' + this.props.stationarySensorID + '/false')
+                    .catch ((err) => {
+                      console.log (err);
+                    });
                   } else {
                     // to start
                     fetch (serverURL + 'updateStationarySensorStatus/' + this.props.stationarySensorID + '/true')
-            	    .catch ((err) => {
-            	      console.log (err);
-            	    });
+            	      .catch ((err) => {
+            	        console.log (err);
+            	      });
                   }
-                }}>{this.state.isStart ? 'Stop' : 'Start'}</button>
+                }}>{this.state.isStart ? '停止監測' : '開始監測'}</button>
+                <div className="pull-right" style={{marginRight: 40}}>
+                  <img src="app/res/img/heart.png" style={{width: 40, height: 40}}></img>
+                  : {this.state.hr}
+                </div>
               </h3>
             </div>
             
@@ -113,7 +126,7 @@ class ECGTable extends Component {
     	  	    <tr>
     	  	      <td>
     	  	      	<div className="panel-group">
-    	  	      	  <div className={(this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+    	  	      	  <div className={(this.state.isStart ? ((this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-info"))) : "panel panel-default")}>
     	  	      	  	<div className="panel-heading">
     	  	      	  	  <h4 className="panel-title">
     	  	      	  	  	<a data-toggle="collapse" href={"#info" + this.props.patientID} aria-expanded="true" aria-controls="info">
@@ -147,7 +160,7 @@ class ECGTable extends Component {
                 <tr>
                   <td>
                     <div className="panel-group">
-                      <div className={(this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-default"))}>
+                      <div className={(this.state.isStart ? ((this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-info"))) : "panel panel-default")}>
                         <div className="panel-heading">
                           <h4 className="panel-title">
                           	<a data-toggle="collapse" href={"#content" + this.props.patientID} aria-expanded="true" aria-controls="content">

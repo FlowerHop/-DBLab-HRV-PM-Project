@@ -59,7 +59,7 @@ class Hemodialysis extends Component {
 
     render () {
       return (
-      	<div>
+      	<div style={{marginTop: '40px'}}>
       	  <div className="row">
       	    <div className="col-md-2"></div>
       	    <div className="col-md-8">
