@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 
 let patientIDs = [];
 let patientNames = {};
-let serverURL = 'http://localhost:1338/';
+// let serverURL = 'http://localhost:1338/';
+let serverURL = "http://140.115.51.30:1338/";
+
 class DeviceManagement extends Component {
     constructor (props) {
       super (props);
