@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import ECGTable from './ECGTable';
 
 // let serverURL = "http://localhost:1338/";
-let serverURL = "http://140.115.51.30:1338";
+let serverURL = "http://140.115.51.30:1338/";
 
 class Hemodialysis extends Component {
     constructor (props) {
