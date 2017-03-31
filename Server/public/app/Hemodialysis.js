@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ECGTable from './ECGTable';
 
-// let serverURL = "http://localhost:1338/";
-let serverURL = "http://140.115.51.30:1338/";
+let serverURL = "http://localhost:1338/";
+// let serverURL = "http://140.115.51.30:1338/";
 
 class Hemodialysis extends Component {
     constructor (props) {
@@ -92,11 +92,11 @@ class Hemodialysis extends Component {
                 </div>
                 <div className="panel-body">
                   <ul className="nav nav-sidebar">
-                    {this.state.patientIDs.map ((patientID) => {
+                    {this.state.patientIDs.map ((patientID, index) => {
                       return (
                         <li key={patientID} className={
                           (this.state.patientStatuses[patientID] == 1) ? "list-group-item-warning" : ((this.state.patientStatuses[patientID] == 2) ? "list-group-item-danger" : "")}>
-                          <a href={"#table" + patientID}>{this.state.patientNames[patientID]}</a>
+                          <a href={"#table" + patientID}>{this.state.patientNames[patientID] + " (床位 " + (this.state.stationarySensorIDs[index].match (/SS-([^-]+)/)[1].charCodeAt (0) - 64) +")"}</a>
                         </li>
                       );
                     })}

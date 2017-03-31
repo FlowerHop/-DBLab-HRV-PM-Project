@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom';
 
 let patientIDs = [];
 let patientNames = {};
-// let serverURL = 'http://localhost:1338/';
-let serverURL = "http://140.115.51.30:1338/";
+let serverURL = 'http://localhost:1338/';
+// let serverURL = "http://140.115.51.30:1338/";
 
 class DeviceManagement extends Component {
     constructor (props) {
@@ -224,14 +224,14 @@ class StationaryTable extends Component {
                           <h3>{"床位 " + (index - 1 + 1)}</h3>
                         </div>
                         <div className="col-md-6" style={{top: '35px', color: '#083D77'}}>
-                          <h3>監測病人ID</h3>
+                          <h3>監測病人</h3>
                           <div className="dropdown">
                           <h3 href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {(this.state.monitor[stationarySensorIDs[index - 1]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index - 1]]]}
+                            <u>{(this.state.monitor[stationarySensorIDs[index - 1]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index - 1]]]}</u>
                             <span className="caret"></span>
                           </h3>
                           <ul className="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <li onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], "無")}}>無</li>
+                            <li onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], "無")}}><u>無</u></li>
                             {patientIDs.map ((patientID, i) => {
                               for (let k in this.state.monitor) {
                                 if (this.state.monitor[k] == patientID) {
@@ -239,7 +239,7 @@ class StationaryTable extends Component {
                                 }
                               }
                               return (
-                                <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], patientID)}}>{patientNames[patientID]}</li>
+                                <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], patientID)}}><u>{patientNames[patientID]}</u></li>
                               );
                             })}
                           </ul>
@@ -253,14 +253,14 @@ class StationaryTable extends Component {
                           <h3>{"床位 " + (index + 1)}</h3>
                         </div>
                         <div className="col-md-6" style={{top: '35px', color: '#083D77'}}>
-                          <h3>監測病人ID</h3>
+                          <h3>監測病人</h3>
                           <div className="dropdown">
                             <h3 href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {(this.state.monitor[stationarySensorIDs[index]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index]]]}
+                              <u>{(this.state.monitor[stationarySensorIDs[index]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index]]]}</u>
                               <span className="caret"></span>
                             </h3>
                             <ul className="dropdown-menu text-center" role="menu" aria-labelledby="dLabel">
-                              <li onClick={() => {this.monitorChange (stationarySensorIDs[index], "無")}}>無</li>
+                              <li onClick={() => {this.monitorChange (stationarySensorIDs[index], "無")}}><u>無</u></li>
                               {patientIDs.map ((patientID, i) => {
                                 for (let k in this.state.monitor) {
                                   if (this.state.monitor[k] == patientID) {
@@ -268,7 +268,7 @@ class StationaryTable extends Component {
                                   }
                                 }
                                 return (
-                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index], patientID)}}>{patientNames[patientID]}</li>
+                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index], patientID)}}><u>{patientNames[patientID]}</u></li>
                                 );
                               })}
                             </ul>
@@ -287,14 +287,14 @@ class StationaryTable extends Component {
                           <h3>{"床位 " + (index + 1)}</h3>
                         </div>
                         <div className="col-md-6" style={{top: '35px', color: '#083D77'}}>
-                          <h3>監測病人ID</h3>
+                          <h3>監測病人</h3>
                           <div className="dropdown">
                             <h3 href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {(this.state.monitor[stationarySensorIDs[index]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index]]]}
+                              <u>{(this.state.monitor[stationarySensorIDs[index]] == "無") ? "無" : patientNames[this.state.monitor[stationarySensorIDs[index]]]}</u>
                               <span className="caret"></span>
                             </h3>
                             <ul className="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                              <li onClick={() => {this.monitorChange (stationarySensorIDs[index], "無")}}>無</li>
+                              <li onClick={() => {this.monitorChange (stationarySensorIDs[index], "無")}}><u>無</u></li>
                               {patientIDs.map ((patientID, i) => {
                                 for (let k in this.state.monitor) {
                                   if (this.state.monitor[k] == patientID) {
@@ -302,7 +302,7 @@ class StationaryTable extends Component {
                                   }
                                 }
                                 return (
-                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[i], patientID)}}>{patientNames[patientID]}</li>
+                                  <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[i], patientID)}}><u>{patientNames[patientID]}</u></li>
                                 );
                               })}
                             </ul>

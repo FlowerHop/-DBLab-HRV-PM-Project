@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ECGGraph from './ECGGraph';
 
-// let serverURL = "http://localhost:1338/";
-let serverURL = "http://140.115.51.30:1338/";
+let serverURL = "http://localhost:1338/";
+// let serverURL = "http://140.115.51.30:1338/";
 
 class ECGTable extends Component {
 	constructor (props) {
@@ -97,7 +97,7 @@ class ECGTable extends Component {
 	  	<div> 
         <div id={"table" + this.props.patientID} className={(this.state.isStart ? ((this.state.status == 0) ? "panel panel-success" : ((this.state.status == 1) ? "panel panel-warning" : ((this.state.status == 2) ? "panel panel-danger" : "panel panel-info"))) : "panel panel-default")}>
             <div className="panel-heading">
-              <h3>病人 <u>{this.state.info.name}</u>
+              <h3>病人 <u>{this.state.info.name + " (床位 " + (this.props.stationarySensorID.match (/SS-([^-]+)/)[1].charCodeAt (0) - 64) + ")"}</u>
 
                 <button className={this.state.isStart ? 'btn btn-danger pull-right' : 'btn btn-success pull-right'} ref='monitorButton' onClick={() => {
                   if (this.state.isStart) {
