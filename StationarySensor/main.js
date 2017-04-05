@@ -18,7 +18,8 @@ serial.on('open', function (err) {
   }
 });
 
-ws = new WebSocket('ws://localhost:1338', {
+ws = new WebSocket('ws://140.115.51.30:1338', {
+  // ws = new WebSocket ('ws://localhost:1338', {
   perMessageDeflate: false
 });
 

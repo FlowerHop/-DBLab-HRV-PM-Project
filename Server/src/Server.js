@@ -12,13 +12,16 @@ const wss = new WebSocket.Server ({ server });
 const AliveServiceManager = require ('./HRVlib/AliveService');
 let StationarySensor = require ('./StationarySensor');
 let Patient = require ('./Patient');
+let Room = require ('./Room');
+let WearableSensor = require ('./WearableSensor');
 
 let patients = {};
 let stationarySensors = {}; 
+let wearableSensors = {};
+let rooms = {};
 
-let stationarySensorIDs = [];
-let patientIDs = [];
 let monitor = {};
+let wear = {};
 
 firebase.initializeApp({
   apiKey: "AIzaSyAepbb4RlwQQclrz4I2dZjlvgOFun_zO5M",
@@ -37,40 +40,72 @@ let database = firebase.database ();
 let stationarySensorsRef = database.ref ('stationarySensors/');
 let patientsRef = database.ref ('patients/');
 let monitorRef = database.ref ('monitor/');
+let wearableSensorsRef = database.ref ('wearableSensors/');
+let roomsRef = database.ref ('rooms/');
+let wearRef = database.ref ('wear/');
 
 stationarySensorsRef.on ('value', (snapShot) => {
-  stationarySensorIDs = snapShot.val ();
-  stationarySensorIDs.forEach ((stationarySensorID) => {
-    if (!stationarySensors[stationarySensorID.id]) {
-      stationarySensors[stationarySensorID.id] = new StationarySensor (stationarySensorID.id);
+  snapShot.val ().forEach ((stationarySensor) => {
+    if (!stationarySensors[stationarySensor.id]) {
+      stationarySensors[stationarySensor.id] = new StationarySensor (stationarySensor.id);
     }
   });
 });
 
 patientsRef.on ('value', (snapShot) => {
-  patientIDs = [];
-  snapShot.val ().forEach ((patient) => {
-    patientIDs.push (patient.id);
-  });
+  // patientIDs = [];
+  // snapShot.val ().forEach ((patient) => {
+  //   patientIDs.push (patient.id);
+  // });
 
-  patientIDs.forEach ((patientID, index) => {
-    if (!patients[patientID]) {
-      patients[patientID] = new Patient (patientID);
-      patients[patientID].name = snapShot.val ()[index].name;
-      patients[patientID].gender = snapShot.val ()[index].gender;
-      patients[patientID].age = snapShot.val ()[index].age;
+  // patientIDs.forEach ((patientID, index) => {
+  //   if (!patients[patientID]) {
+  //     patients[patientID] = new Patient (patientID);
+  //     patients[patientID].name = snapShot.val ()[index].name;
+  //     patients[patientID].gender = snapShot.val ()[index].gender;
+  //     patients[patientID].age = snapShot.val ()[index].age;
+  //   }
+  // });
+
+  snapShot.val ().forEach ((patient) => {
+    if (!patients[patient.id]) {
+      patients[patient.id] = new Patient (patient.id);
+      patients[patient.id].name = patient.name;
+      patients[patient.id].gender = patient.gender;
+      patients[patient.id].age = patient.age;
     }
   });
 });
 
 monitorRef.on ('value', (snapShot) => {
   monitor = snapShot.val ();
-  for (var k in monitor) {
+  for (let k in monitor) {
     stationarySensors[k].patient = patients[monitor[k]];
   }
 });
 
+wearableSensorsRef.on ('value', (snapShot) => {
+  snapShot.val ().forEach ((wearableSensor) => {
+    if (!wearableSensors[wearableSensor.id]) {
+      wearableSensors[wearableSensor.id] = new WearableSensor (wearableSensor.id);
+    }
+  });
+});
 
+roomsRef.on ('value', (snapShot) => {
+  snapShot.val ().forEach ((room) => {
+    if (!rooms[room.id]) {
+      rooms[room.id] = new Room (room.id);
+    }
+  });
+});
+
+wearRef.on ('value', (snapShot) => {
+  wear = snapShot.val ();
+  for (let k in wear) {
+    wearableSensors[k].patient = patients[wear[k]];
+  }
+});
 
 
 wss.on ('connection', (ws) => {
@@ -80,11 +115,15 @@ wss.on ('connection', (ws) => {
     if (!message.match) {
       return;
     } 	
-  	let pattern = /id\/([\w|:|-]+)/;
-  	let match = message.match (pattern);
-  	match = match ? match[1] : undefined;
-  	if (match !== undefined) {
-      let id = match;
+  	let stationarySensorPattern = /stationarySensorID\/([\w|:|-]+)/;
+    let roomPattern = /roomID\/([\w|:|-]+)/;
+
+  	let stationarySensorMatch = message.match (stationarySensorPattern);
+    let roomMatch = message.match (roomPattern);
+
+  	stationarySensorMatch = stationarySensorMatch ? stationarySensorMatch[1] : undefined;
+  	if (stationarySensorMatch !== undefined) {
+      let id = stationarySensorMatch;
       console.log ('Receive a stationary sensor (' +  id + ')');
         
       ws.send ('ok');         
@@ -92,15 +131,32 @@ wss.on ('connection', (ws) => {
       if (stationarySensor) {
         stationarySensor.initWS (ws);
       }
-  	} 
+  	} else if (roomMatch !== undefined) {
+      let id = roomMatch;
+      console.log ('Receive a room (' +  id + ')');
+        
+      ws.send ('ok');         
+      let room = rooms[id];
+      
+      ws.on ('message', (message) => {
+        console.log (message);
+        
+        let wearableSensorID = message.wearableSensorID;
+        let hr = message.hr;
+        let rssi = message.rssi;
+        if (wearableSensors[wearableSensorID]) {
+          if (room.scan (wearableSensors[wearableSensorID], rssi)) {
+            wearableSensors[wearableSensorID].patient.inputHR (pulse);
+          }
+        }
+      });
+    }
   });
 });
 
 app.set ('port', process.env.PORT || 1338);
 app.use (bodyParser.json ());
 app.use ('/', express.static ('public'));
-
-
 
 // Additional middleware which will set headers that we need on each request.
 app.use ((req, res, next) => {
@@ -118,9 +174,67 @@ app.get ('/helloWorld', (req, res) => {
   res.end ();
 });
 
-app.get ('/test/start/:stationarySensorID', (req, res) => {
-  let stationarySensorID = req.params.stationarySensorID;
-  stationarySensors[stationarySensorID].start ();
+app.get ('/test/scannedWearableSensor/:roomID/:wearableSensorID/:rssi/:hr/', (req, res) => {
+  let roomID = req.params.roomID;
+  let wearableSensorID = req.params.wearableSensorID;
+  let rssi = req.params.rssi;
+  let hr = req.params.hr;
+
+  if (rooms[roomID].scan (wearableSensors[wearableSensorID], rssi)) {
+    if (wearableSensors[wearableSensorID].patient) {
+      wearableSensors[wearableSensorID].patient.inputHR (hr);
+    }
+  }
+
+  res.send ("roomID: " + roomID 
+    + ", wearableSensorID: " + wearableSensorID
+    + ", hr: " + hr);
+});
+
+app.get ('/getPatientsAtRoom/:roomID', (req, res) => {
+  let roomID = req.params.roomID;
+  let wearableSensors = rooms[roomID].wearableSensors;
+  let patients = [];
+
+  wearableSensors.forEach ((wearableSensor) => {
+    let patient = wearableSensor.patient;
+    if (patient) {
+      patients.push ({
+        id: patient.id,
+        name: patient.name,
+        gender: patient.gender,
+        age: patient.age
+      });
+    }
+  });
+
+  res.send (JSON.stringify (patients));
+});
+
+app.get ('/getRoomIDs', (req, res) => {
+  let roomIDs = [];
+  for (let k in rooms) {
+    roomIDs.push (k);
+  }
+  res.send (JSON.stringify (roomIDs));
+});
+
+app.get ('/getWearableSensorIDs', (req, res) => {
+  let wearableSensorIDs = [];
+  for (let k in wearableSensors) {
+    wearableSensorIDs.push (k);
+  }
+  res.send (JSON.stringify (wearableSensorIDs));
+});
+
+app.get ('/getWear', (req, res) => {
+  res.send (JSON.stringify (wear));
+});
+
+app.post ('/updateWear', (req, res) => {
+  let newWear = req.body;
+
+  database.ref ('wear/').update (newWear);
   res.send ();
 });
 
@@ -188,19 +302,19 @@ app.post ('/updateMonitor/', (req, res) => {
   res.send ();
 });
 
-app.post ('/removeStationarySensor/', (req, res) => {
-  let stationarySensorID = req.body.stationarySensorID;
-  stationarySensorIDs.forEach ((elem, index) => {
-    if (stationarySensorID == elem.id) {
-      stationarySensorIDs.splice (index, 1);
-      delete monitor[stationarySensorID];
-      database.ref ('stationarySensors/').set (stationarySensorIDs);
-      database.ref ('monitor/').set (monitor);
-      res.send ();
-      return;
-    }
-  });
-});
+// app.post ('/removeStationarySensor/', (req, res) => {
+//   let stationarySensorID = req.body.stationarySensorID;
+//   stationarySensorIDs.forEach ((elem, index) => {
+//     if (stationarySensorID == elem.id) {
+//       stationarySensorIDs.splice (index, 1);
+//       delete monitor[stationarySensorID];
+//       database.ref ('stationarySensors/').set (stationarySensorIDs);
+//       database.ref ('monitor/').set (monitor);
+//       res.send ();
+//       return;
+//     }
+//   });
+// });
 
 app.get ('/newStationarySensor/:id', (req, res) => {
   let id = req.params.id;
@@ -212,43 +326,27 @@ app.get ('/newStationarySensor/:id', (req, res) => {
   res.end ();
 });
 
-// app.get ('/getParameters/:id', (req, res) => {
-//   // for (let k in patients) {
-//   //   let patient = patients[k];
-//   //   if (patient.id == req.params.id) {
-//   //     res.send (JSON.stringify (patient.getParameters ()));
-//   //     return;
-//   //   } 
-//   // }
-
-//   // need to remove because stationarySensor don't care about parameter
-//   let id = req.params.id;
-//   if (stationarySensors[id]) {
-//     res.send (JSON.stringify (stationarySensors[id].getParameters ()))
-//   }
-// });
-
 app.get ('/getStationarySensorIDs', (req, res) => {
   // let ids = [];
   // stationarySensors.forEach ((stationarySensor) => {
   //   ids.push (stationarySensor.id);
   // });
+  let stationarySensorIDs = [];
+  for (let k in stationarySensors) {
+    stationarySensorIDs.push (k);
+  }
   res.send (JSON.stringify (stationarySensorIDs));
 });
-
-// app.get ('/getStationarySensors', (req, res) => {
-//   res.send (JSON.stringify (stationarySensors));
-// })
 
 app.get ('/getMonitor', (req, res) => {
   res.send (JSON.stringify (monitor));
 })
 
-// app.get ('/getPatients', (req, res) => {
-//   res.send (JSON.stringify (patients));
-// });
-
 app.get ('/getPatientIDs', (req, res) => {
+  let patientIDs = [];
+  for (let k in patients) {
+    patientIDs.push (k);
+  }
   res.send (JSON.stringify (patientIDs));
 });
 

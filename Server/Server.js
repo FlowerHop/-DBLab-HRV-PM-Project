@@ -14,13 +14,16 @@ var wss = new WebSocket.Server({ server: server });
 var AliveServiceManager = require('./HRVlib/AliveService');
 var StationarySensor = require('./StationarySensor');
 var Patient = require('./Patient');
+var Room = require('./Room');
+var WearableSensor = require('./WearableSensor');
 
 var patients = {};
 var stationarySensors = {};
+var wearableSensors = {};
+var rooms = {};
 
-var stationarySensorIDs = [];
-var patientIDs = [];
 var monitor = {};
+var wear = {};
 
 firebase.initializeApp({
   apiKey: "AIzaSyAepbb4RlwQQclrz4I2dZjlvgOFun_zO5M",
@@ -39,28 +42,39 @@ var database = firebase.database();
 var stationarySensorsRef = database.ref('stationarySensors/');
 var patientsRef = database.ref('patients/');
 var monitorRef = database.ref('monitor/');
+var wearableSensorsRef = database.ref('wearableSensors/');
+var roomsRef = database.ref('rooms/');
+var wearRef = database.ref('wear/');
 
 stationarySensorsRef.on('value', function (snapShot) {
-  stationarySensorIDs = snapShot.val();
-  stationarySensorIDs.forEach(function (stationarySensorID) {
-    if (!stationarySensors[stationarySensorID.id]) {
-      stationarySensors[stationarySensorID.id] = new StationarySensor(stationarySensorID.id);
+  snapShot.val().forEach(function (stationarySensor) {
+    if (!stationarySensors[stationarySensor.id]) {
+      stationarySensors[stationarySensor.id] = new StationarySensor(stationarySensor.id);
     }
   });
 });
 
 patientsRef.on('value', function (snapShot) {
-  patientIDs = [];
-  snapShot.val().forEach(function (patient) {
-    patientIDs.push(patient.id);
-  });
+  // patientIDs = [];
+  // snapShot.val ().forEach ((patient) => {
+  //   patientIDs.push (patient.id);
+  // });
 
-  patientIDs.forEach(function (patientID, index) {
-    if (!patients[patientID]) {
-      patients[patientID] = new Patient(patientID);
-      patients[patientID].name = snapShot.val()[index].name;
-      patients[patientID].gender = snapShot.val()[index].gender;
-      patients[patientID].age = snapShot.val()[index].age;
+  // patientIDs.forEach ((patientID, index) => {
+  //   if (!patients[patientID]) {
+  //     patients[patientID] = new Patient (patientID);
+  //     patients[patientID].name = snapShot.val ()[index].name;
+  //     patients[patientID].gender = snapShot.val ()[index].gender;
+  //     patients[patientID].age = snapShot.val ()[index].age;
+  //   }
+  // });
+
+  snapShot.val().forEach(function (patient) {
+    if (!patients[patient.id]) {
+      patients[patient.id] = new Patient(patient.id);
+      patients[patient.id].name = patient.name;
+      patients[patient.id].gender = patient.gender;
+      patients[patient.id].age = patient.age;
     }
   });
 });
@@ -72,6 +86,29 @@ monitorRef.on('value', function (snapShot) {
   }
 });
 
+wearableSensorsRef.on('value', function (snapShot) {
+  snapShot.val().forEach(function (wearableSensor) {
+    if (!wearableSensors[wearableSensor.id]) {
+      wearableSensors[wearableSensor.id] = new WearableSensor(wearableSensor.id);
+    }
+  });
+});
+
+roomsRef.on('value', function (snapShot) {
+  snapShot.val().forEach(function (room) {
+    if (!rooms[room.id]) {
+      rooms[room.id] = new Room(room.id);
+    }
+  });
+});
+
+wearRef.on('value', function (snapShot) {
+  wear = snapShot.val();
+  for (var k in wear) {
+    wearableSensors[k].patient = patients[wear[k]];
+  }
+});
+
 wss.on('connection', function (ws) {
   console.log('connection');
 
@@ -79,11 +116,15 @@ wss.on('connection', function (ws) {
     if (!message.match) {
       return;
     }
-    var pattern = /id\/([\w|:|-]+)/;
-    var match = message.match(pattern);
-    match = match ? match[1] : undefined;
-    if (match !== undefined) {
-      var id = match;
+    var stationarySensorPattern = /stationarySensorID\/([\w|:|-]+)/;
+    var roomPattern = /roomID\/([\w|:|-]+)/;
+
+    var stationarySensorMatch = message.match(stationarySensorPattern);
+    var roomMatch = message.match(roomPattern);
+
+    stationarySensorMatch = stationarySensorMatch ? stationarySensorMatch[1] : undefined;
+    if (stationarySensorMatch !== undefined) {
+      var id = stationarySensorMatch;
       console.log('Receive a stationary sensor (' + id + ')');
 
       ws.send('ok');
@@ -91,6 +132,25 @@ wss.on('connection', function (ws) {
       if (stationarySensor) {
         stationarySensor.initWS(ws);
       }
+    } else if (roomMatch !== undefined) {
+      var _id = roomMatch;
+      console.log('Receive a room (' + _id + ')');
+
+      ws.send('ok');
+      var room = rooms[_id];
+
+      ws.on('message', function (message) {
+        console.log(message);
+
+        var wearableSensorID = message.wearableSensorID;
+        var hr = message.hr;
+        var rssi = message.rssi;
+        if (wearableSensors[wearableSensorID]) {
+          if (room.scan(wearableSensors[wearableSensorID], rssi)) {
+            wearableSensors[wearableSensorID].patient.inputHR(pulse);
+          }
+        }
+      });
     }
   });
 });
@@ -115,9 +175,65 @@ app.get('/helloWorld', function (req, res) {
   res.end();
 });
 
-app.get('/test/start/:stationarySensorID', function (req, res) {
-  var stationarySensorID = req.params.stationarySensorID;
-  stationarySensors[stationarySensorID].start();
+app.get('/test/scannedWearableSensor/:roomID/:wearableSensorID/:rssi/:hr/', function (req, res) {
+  var roomID = req.params.roomID;
+  var wearableSensorID = req.params.wearableSensorID;
+  var rssi = req.params.rssi;
+  var hr = req.params.hr;
+
+  if (rooms[roomID].scan(wearableSensors[wearableSensorID], rssi)) {
+    if (wearableSensors[wearableSensorID].patient) {
+      wearableSensors[wearableSensorID].patient.inputHR(hr);
+    }
+  }
+
+  res.send("roomID: " + roomID + ", wearableSensorID: " + wearableSensorID + ", hr: " + hr);
+});
+
+app.get('/getPatientsAtRoom/:roomID', function (req, res) {
+  var roomID = req.params.roomID;
+  var wearableSensors = rooms[roomID].wearableSensors;
+  var patients = [];
+
+  wearableSensors.forEach(function (wearableSensor) {
+    var patient = wearableSensor.patient;
+    if (patient) {
+      patients.push({
+        id: patient.id,
+        name: patient.name,
+        gender: patient.gender,
+        age: patient.age
+      });
+    }
+  });
+
+  res.send(JSON.stringify(patients));
+});
+
+app.get('/getRoomIDs', function (req, res) {
+  var roomIDs = [];
+  for (var k in rooms) {
+    roomIDs.push(k);
+  }
+  res.send(JSON.stringify(roomIDs));
+});
+
+app.get('/getWearableSensorIDs', function (req, res) {
+  var wearableSensorIDs = [];
+  for (var k in wearableSensors) {
+    wearableSensorIDs.push(k);
+  }
+  res.send(JSON.stringify(wearableSensorIDs));
+});
+
+app.get('/getWear', function (req, res) {
+  res.send(JSON.stringify(wear));
+});
+
+app.post('/updateWear', function (req, res) {
+  var newWear = req.body;
+
+  database.ref('wear/').update(newWear);
   res.send();
 });
 
@@ -185,19 +301,19 @@ app.post('/updateMonitor/', function (req, res) {
   res.send();
 });
 
-app.post('/removeStationarySensor/', function (req, res) {
-  var stationarySensorID = req.body.stationarySensorID;
-  stationarySensorIDs.forEach(function (elem, index) {
-    if (stationarySensorID == elem.id) {
-      stationarySensorIDs.splice(index, 1);
-      delete monitor[stationarySensorID];
-      database.ref('stationarySensors/').set(stationarySensorIDs);
-      database.ref('monitor/').set(monitor);
-      res.send();
-      return;
-    }
-  });
-});
+// app.post ('/removeStationarySensor/', (req, res) => {
+//   let stationarySensorID = req.body.stationarySensorID;
+//   stationarySensorIDs.forEach ((elem, index) => {
+//     if (stationarySensorID == elem.id) {
+//       stationarySensorIDs.splice (index, 1);
+//       delete monitor[stationarySensorID];
+//       database.ref ('stationarySensors/').set (stationarySensorIDs);
+//       database.ref ('monitor/').set (monitor);
+//       res.send ();
+//       return;
+//     }
+//   });
+// });
 
 app.get('/newStationarySensor/:id', function (req, res) {
   var id = req.params.id;
@@ -209,43 +325,27 @@ app.get('/newStationarySensor/:id', function (req, res) {
   res.end();
 });
 
-// app.get ('/getParameters/:id', (req, res) => {
-//   // for (let k in patients) {
-//   //   let patient = patients[k];
-//   //   if (patient.id == req.params.id) {
-//   //     res.send (JSON.stringify (patient.getParameters ()));
-//   //     return;
-//   //   } 
-//   // }
-
-//   // need to remove because stationarySensor don't care about parameter
-//   let id = req.params.id;
-//   if (stationarySensors[id]) {
-//     res.send (JSON.stringify (stationarySensors[id].getParameters ()))
-//   }
-// });
-
 app.get('/getStationarySensorIDs', function (req, res) {
   // let ids = [];
   // stationarySensors.forEach ((stationarySensor) => {
   //   ids.push (stationarySensor.id);
   // });
+  var stationarySensorIDs = [];
+  for (var k in stationarySensors) {
+    stationarySensorIDs.push(k);
+  }
   res.send(JSON.stringify(stationarySensorIDs));
 });
-
-// app.get ('/getStationarySensors', (req, res) => {
-//   res.send (JSON.stringify (stationarySensors));
-// })
 
 app.get('/getMonitor', function (req, res) {
   res.send(JSON.stringify(monitor));
 });
 
-// app.get ('/getPatients', (req, res) => {
-//   res.send (JSON.stringify (patients));
-// });
-
 app.get('/getPatientIDs', function (req, res) {
+  var patientIDs = [];
+  for (var k in patients) {
+    patientIDs.push(k);
+  }
   res.send(JSON.stringify(patientIDs));
 });
 

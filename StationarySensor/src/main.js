@@ -23,7 +23,7 @@ ws = new WebSocket ('ws://140.115.51.30:1338', {
 
 ws.on ('open', () => {
   console.log ('connection');
-  ws.send ('id/' + id);
+  ws.send ('stationarySensorID/' + id);
 });
 
 ws.on ('message', handleInit);
@@ -66,7 +66,7 @@ serial.on ('data', (data) => {
   }
 });
 
-ws.on ('close', function () {
+ws.on ('close', () => {
   console.log ('close');
 });
 

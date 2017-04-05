@@ -21,8 +21,8 @@ class DeviceManagement extends Component {
       .then ((response) => response.json ())
       .then ((response) => {
         let stationarySensorIDs = [];
-        response.forEach ((stationarySensor) => {
-          stationarySensorIDs.push (stationarySensor.id);
+        response.forEach ((stationarySensorID) => {
+          stationarySensorIDs.push (stationarySensorID);
         });
         this.setState ({stationarySensorIDs: stationarySensorIDs});      
       })
@@ -96,8 +96,8 @@ class StationaryTable extends Component {
       .then ((response) => {
         // console.log (response);  
         let stationarySensorIDs = [];
-        response.forEach ((stationarySensor) => {
-          stationarySensorIDs.push (stationarySensor.id);
+        response.forEach ((stationarySensorID) => {
+          stationarySensorIDs.push (stationarySensorID);
         });
         this.setState ({stationarySensorIDs: stationarySensorIDs});      
       })
@@ -105,7 +105,6 @@ class StationaryTable extends Component {
         console.log (err);
       });
       
-
       // next will move to the top
       fetch (serverURL + 'getPatientIDs')
       .then ((response) => response.json ())
@@ -238,6 +237,7 @@ class StationaryTable extends Component {
                                   return;
                                 }
                               }
+
                               return (
                                 <li key={i} onClick={() => {this.monitorChange (stationarySensorIDs[index - 1], patientID)}}><u>{patientNames[patientID]}</u></li>
                               );

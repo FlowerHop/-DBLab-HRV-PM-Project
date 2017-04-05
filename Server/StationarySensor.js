@@ -15,28 +15,8 @@ var Patient = require('./Patient');
       this.ws;
       this.patient = patient;
       this.isStart = false;
-      // this.wss = new Array (2);
-      // this.patients = [arguments[1] ? new Patient (arguments[1].id, arguments[1].name) : arguments[0], 
-      // arguments[2] ? new Patient (arguments[2].id, arguments[2].name) : arguments[1]];
       // future: when server restarts, newing a Patient should be after checking past record if exists
     }
-
-    // initWS (wsA, wsB) { // init when this.wss[index] === undefined
-    //     for (let i = 0; i < this.wss.length; i++) {
-    //     	if (!this.wss[i] && arguments[i]) {
-    //             this.wss[i] = arguments[i];
-    //             this.wss[i].on ('message', (message) => {
-    //               // console.log ('Port :' + ((i == 0) ? 'A' : 'B') + ': ' + message);
-    //               // input signals
-    //               this.patients[i].inputBioSignals (message);
-    //             });
-
-    //             this.wss[i].on ('close', () => {
-    //             	this.wss[i] = undefined;
-    //             });
-    //     	}
-    //     }
-    // }
 
     _createClass(StationarySensor, [{
       key: 'initWS',
@@ -49,7 +29,7 @@ var Patient = require('./Patient');
 
         this.ws.on('message', function (message) {
           if (_this.patient) {
-            _this.patient.inputBioSignals(message);
+            _this.patient.inputECGSamples(message);
           }
         });
 
@@ -82,21 +62,6 @@ var Patient = require('./Patient');
           }
         }
       }
-
-      // getParameters () {
-      //     let parameters = [];
-
-      //     this.patients.forEach ((patient) => {
-      //       parameters.push ({
-      //         id: patient.id, 
-      //         name: patient.name,
-      //         parameters: patient.getParameters ()
-      //       });  
-      //     });
-
-      //     return parameters;
-      // }
-
     }]);
 
     return StationarySensor;
