@@ -123,6 +123,8 @@ wss.on('connection', function (ws) {
     var roomMatch = message.match(roomPattern);
 
     stationarySensorMatch = stationarySensorMatch ? stationarySensorMatch[1] : undefined;
+    roomMatch = roomMatch ? roomMatch[1] : undefined;
+
     if (stationarySensorMatch !== undefined) {
       var id = stationarySensorMatch;
       console.log('Receive a stationary sensor (' + id + ')');
