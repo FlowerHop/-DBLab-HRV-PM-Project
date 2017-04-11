@@ -203,7 +203,8 @@ app.get ('/getPatientsAtRoom/:roomID', (req, res) => {
         id: patient.id,
         name: patient.name,
         gender: patient.gender,
-        age: patient.age
+        age: patient.age,
+        hr: patient.hr
       });
     }
   });
