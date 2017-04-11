@@ -81,7 +81,7 @@ class HospitalWard extends Component {
                 return (
                   <div id={roomID} key={roomID} className="panel panel-primary">
                     <div className="panel-heading">
-                      <h3>{"Room " + roomID}</h3>
+                      <h3>{"Room " + roomID.match (/R-([^-]+)/)[1]}</h3>
                     </div>
                     <div className="panel-body">
                       <table className="table">
