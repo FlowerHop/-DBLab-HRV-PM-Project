@@ -19,11 +19,11 @@ const serverURL = "ws://140.115.51.30:1338";
 const IN_PLACE = process.argv[2];
 let isStart = false;
 
-rpio.open (11, rpio.INPUT);
+RPIO.open (11, RPIO.INPUT);
 let isThere = false;
 
 setInterval (() => {
-  isThere = rpio.read (11);
+  isThere = RPIO.read (11);
   ws.send (JSON.stringify ({moveInWC: isThere}));
 }, 20);
 
