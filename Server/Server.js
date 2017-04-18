@@ -154,7 +154,7 @@ wss.on('connection', function (ws) {
           if (wearableSensors[wearableSensorID]) {
             room.scanMove(moveInWC);
             if (room.scan(wearableSensors[wearableSensorID], rssi)) {
-              wearableSensors[wearableSensorID].patient.inputHR(pulse);
+              wearableSensors[wearableSensorID].patient.inputHR(hr);
             }
           }
         } else {
