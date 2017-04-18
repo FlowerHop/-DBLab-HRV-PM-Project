@@ -58,7 +58,7 @@ xbeeAPI.on("frame_object", function (frame) {
 });
 
 function packageAnalyzer(data) {
-  var wearableSensorID = String.fromCharCode(data.toString('utf-8', 1, 1).charCodeAt(0) + 16);
+  var wearableSensorID = "WS-" + String.fromCharCode(new String(data.readUIntBE(1, 1)).charCodeAt(0) + 16 - 3);
   var index = data.readUIntBE(2, 5);
   var pulse = data.readUIntBE(7, 1);
 

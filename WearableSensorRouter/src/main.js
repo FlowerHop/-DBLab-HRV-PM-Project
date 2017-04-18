@@ -58,7 +58,7 @@ xbeeAPI.on ("frame_object", (frame) => {
 });
 
 function packageAnalyzer (data) {
-  let wearableSensorID = String.fromCharCode (data.toString ('utf-8', 1, 1).charCodeAt (0) + 16);
+  let wearableSensorID = "WS-" + String.fromCharCode (new String (data.readUIntBE (1, 1)).charCodeAt (0) + 16 - 3);
   let index = data.readUIntBE (2, 5);
   let pulse = data.readUIntBE (7, 1);
   
@@ -73,7 +73,7 @@ function handleInit (message) {
   if (message == 'ok') {
   	ws.removeEventListener ('message', handleInit);
     ws.on ('message', atMode);
-    
+
     setInterval (() => {
       isThere = RPIO.read (11);
       ws.send (JSON.stringify ({moveInWC: isThere}));
