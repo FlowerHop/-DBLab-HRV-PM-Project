@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-let serverURL = "http://localhost:1338/";
-// let serverURL = "http://140.115.51.30:1338/";
+// let serverURL = "http://localhost:1338/";
+let serverURL = "http://140.115.51.30:1338/";
 
 class ECGTitle extends Component {
 	constructor (props) {

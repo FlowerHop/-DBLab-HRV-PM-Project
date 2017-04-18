@@ -2,22 +2,30 @@
 
 const SerialPort = require ('serialport');
 const WebSocket = require ('ws');
-
+const RPIO = require ('rpio');
 const xbee_api = require ('xbee-api');
 const C = xbee_api.constants;
-const COM_NUM = "/dev/cu.usbserial-A403MPU4"; // mac usb
-// const COM_NUM = "/dev/ttyUSB0" // Linux usb
+// const COM_NUM = "/dev/cu.usbserial-A403MPU4"; // mac usb
+const COM_NUM = "/dev/ttyUSB0" // Linux usb
 const BAUDRATE = 9600;
 
 const xbeeAPI = new xbee_api.XBeeAPI ({
 	api_mode: 1
 });
 
-// const serverURL = "ws://140.115.51.30:1338";
-const serverURL = "ws://localhost:1338";
+const serverURL = "ws://140.115.51.30:1338";
+// const serverURL = "ws://localhost:1338";
 
 const IN_PLACE = process.argv[2];
 let isStart = false;
+
+rpio.open (11, rpio.INPUT);
+let isThere = false;
+
+setInterval (() => {
+  isThere = rpio.read (11);
+  ws.send (JSON.stringify ({moveInWC: isThere}));
+}, 20);
 
 let ws = new WebSocket (serverURL, { perMessageDeflate: false });
 
@@ -37,9 +45,9 @@ serialport.on ("open", () => {
 xbeeAPI.on ("frame_object", (frame) => {
 	console.log (">>", frame);
     
-    let rssi = frame.rssi;
-    let gatewayTimestamp = new Date ().getTime ();
-    let signal = packageAnalyzer (frame.data);
+  let rssi = frame.rssi;
+  let gatewayTimestamp = new Date ().getTime ();
+  let signal = packageAnalyzer (frame.data);
 	
 	let bioWatchSignal = {
 	  roomID: IN_PLACE,
@@ -47,16 +55,15 @@ xbeeAPI.on ("frame_object", (frame) => {
 	  index: signal.index,
 	  hr: signal.pulse,
 	  rssi: rssi,
-	  gatewayTimestamp: gatewayTimestamp
+	  gatewayTimestamp: gatewayTimestamp, 
+    moveInWC: isThere 
 	};
 
-	// if (isStart) {
-	ws.send (bioWatchSignal);
-	// }
+	ws.send (JSON.stringify (bioWatchSignal));
 });
 
 function packageAnalyzer (data) {
-  let wearableSensorID = data.toString ('utf-8', 0, 2);
+  let wearableSensorID = String.fromCharCode (data.toString ('utf-8', 1, 1).charCodeAt (0) + 16);
   let index = data.readUIntBE (2, 5);
   let pulse = data.readUIntBE (7, 1);
   

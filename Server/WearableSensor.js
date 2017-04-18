@@ -12,6 +12,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this.id = id;
       this.patient = patient;
       this.room = null;
+      this.inWC = false;
     }
 
     _createClass(WearableSensor, [{

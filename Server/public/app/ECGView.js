@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import CirFloatBufferManager from './lib/CirFloatBuffer';
 import MainsFilterManager from './lib/MainsFilter';
 
-let serverURL = "http://localhost:1338/";
-// let serverURL = "http://140.115.51.30:1338/";
+// let serverURL = "http://localhost:1338/";
+let serverURL = "http://140.115.51.30:1338/";
 
 class ECGView extends Component {
     constructor (props) {

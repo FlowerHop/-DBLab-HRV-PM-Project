@@ -4,6 +4,7 @@
       this.id = id;
       this.patient = patient;
       this.room = null;
+      this.inWC = false;
     }
 
     woreBy () {

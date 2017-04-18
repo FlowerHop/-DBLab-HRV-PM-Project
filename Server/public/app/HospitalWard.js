@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-let serverURL = "http://localhost:1338/";
+// let serverURL = "http://localhost:1338/"
+let serverURL = "http://140.115.51.30:1338/";
 
 class HospitalWard extends Component {
     constructor (props) {
@@ -64,8 +65,8 @@ class HospitalWard extends Component {
                       	this.state.patients[roomID] ? 
                           this.state.patients[roomID].map ((patient) => {
                             return (
-                              <li key={patient.id} className={ patient.hr == "---" ? "" : (patient.hr >= 60 ? (patient.hr <= 100 ? "" : "list-group-item-danger") : "list-group-item-danger") }>
-                                <a href={"#table" + patient.id}>{patient.name}</a>
+                              <li key={patient.id} className={ patient.hr == "---" ? "" : (patient.hr >= 60 ? (patient.hr <= 100 ? "" : "list-group-item-danger") : "list-group-item-warning") }>
+                                <a href={"#table" + patient.id}>{patient.name}<span className="label label-primary" style={{marginLeft: 15}}>WC</span></a>
                               </li>
                             );
                           }) : ""
@@ -91,9 +92,10 @@ class HospitalWard extends Component {
                       	      this.state.patients[roomID].map ((patient) => {
                       	        return (
                                   <tr key={patient.id} id={"table" + patient.id}>
-                                    <td className={ patient.hr == "---" ? "" : (patient.hr >= 60 ? (patient.hr <= 100 ? "" : "list-group-item-danger") : "list-group-item-danger") }>
+                                    <td className={ patient.hr == "---" ? "" : (patient.hr >= 60 ? (patient.hr <= 100 ? "" : "list-group-item-danger") : "list-group-item-warning") }>
                               	      <h3>
                               	        {patient.name}
+                                        <span className="label label-primary" style={{marginLeft: 20}}>WC</span>
                               	        <div className="pull-right" style={{marginRight: 40}}>
                               	          <img src="app/res/img/heart.png" style={{width: 40, height: 40}}></img>
                               	          : {patient.hr}

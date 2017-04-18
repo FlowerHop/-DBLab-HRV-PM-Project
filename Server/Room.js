@@ -13,6 +13,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this.wearableSensors = [];
       this.rssiMap = {};
       this.ws;
+      this.moveInWC = false;
+      this.wearableSensorInWC;
     }
 
     _createClass(Room, [{
@@ -51,6 +53,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             delete this.rssiMap[wearableSensor.id];
             break;
           }
+        }
+      }
+    }, {
+      key: "scanMove",
+      value: function scanMove(moveInWC) {
+        if (!this.moveInWC && moveInWC) {
+          this.moveInWC = true; // coming
+          var wearableSensorInWC = void 0;
+          var minRSSI = 500;
+
+          this.wearableSensors.forEach(function (wearableSensor) {
+            rssi = rssiMap[wearableSensor.id];
+            if (rssi < minRSSI) {
+              minRSSI = rssi;
+              wearableSensorInWC = wearableSensor;
+            }
+          });
+
+          if (wearableSensorInWC) {
+            if (this.wearableSensorInWC) {
+              this.wearableSensorInWC.inWC = false; // move out the bigger rssi one
+            }
+
+            this.wearableSensorInWC = wearableSensorInWC;
+            this.wearableSensorInWC.inWC = true;
+          }
+        } else if (this.moveInWC && !moveInWC) {
+          this.moveInWC = false; // left
+          this.wearableSensorInWC.inWC = false;
+          this.wearableSensorInWC = undefined;
         }
       }
     }]);

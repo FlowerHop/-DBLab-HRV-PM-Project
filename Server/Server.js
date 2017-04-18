@@ -142,15 +142,22 @@ wss.on('connection', function (ws) {
       var room = rooms[_id];
 
       ws.on('message', function (message) {
+        message = JSON.parse(message);
         console.log(message);
+        if (message.wearableSensorID) {
+          var wearableSensorID = message.wearableSensorID;
+          var hr = message.hr;
+          var rssi = message.rssi;
+          var _moveInWC = message.moveInWC;
 
-        var wearableSensorID = message.wearableSensorID;
-        var hr = message.hr;
-        var rssi = message.rssi;
-        if (wearableSensors[wearableSensorID]) {
-          if (room.scan(wearableSensors[wearableSensorID], rssi)) {
-            wearableSensors[wearableSensorID].patient.inputHR(pulse);
+          if (wearableSensors[wearableSensorID]) {
+            room.scanMove(_moveInWC);
+            if (room.scan(wearableSensors[wearableSensorID], rssi)) {
+              wearableSensors[wearableSensorID].patient.inputHR(pulse);
+            }
           }
+        } else {
+          room.scanMove(moveInWC);
         }
       });
     }
@@ -227,6 +234,11 @@ app.get('/getWearableSensorIDs', function (req, res) {
     wearableSensorIDs.push(k);
   }
   res.send(JSON.stringify(wearableSensorIDs));
+});
+
+app.get('/getIsInWC/:wearableSensorID', function (req, res) {
+  var wearableSensorID = req.params.wearableSensorID;
+  res.send(JSON.stringify(wearableSensors[wearableSensorID].inWC));
 });
 
 app.get('/getWear', function (req, res) {

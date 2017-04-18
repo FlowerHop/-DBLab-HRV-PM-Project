@@ -123,7 +123,7 @@ wss.on ('connection', (ws) => {
 
   	stationarySensorMatch = stationarySensorMatch ? stationarySensorMatch[1] : undefined;
     roomMatch = roomMatch ? roomMatch[1] : undefined;
-    
+
   	if (stationarySensorMatch !== undefined) {
       let id = stationarySensorMatch;
       console.log ('Receive a stationary sensor (' +  id + ')');
@@ -141,15 +141,22 @@ wss.on ('connection', (ws) => {
       let room = rooms[id];
       
       ws.on ('message', (message) => {
+        message = JSON.parse (message);
         console.log (message);
-        
-        let wearableSensorID = message.wearableSensorID;
-        let hr = message.hr;
-        let rssi = message.rssi;
-        if (wearableSensors[wearableSensorID]) {
-          if (room.scan (wearableSensors[wearableSensorID], rssi)) {
-            wearableSensors[wearableSensorID].patient.inputHR (pulse);
+        if (message.wearableSensorID) {
+          let wearableSensorID = message.wearableSensorID;
+          let hr = message.hr;
+          let rssi = message.rssi;
+          let moveInWC = message.moveInWC;
+
+          if (wearableSensors[wearableSensorID]) {
+            room.scanMove (moveInWC);
+            if (room.scan (wearableSensors[wearableSensorID], rssi)) {
+              wearableSensors[wearableSensorID].patient.inputHR (pulse);
+            }
           }
+        } else {
+          room.scanMove (moveInWC);
         }
       });
     }
@@ -228,6 +235,12 @@ app.get ('/getWearableSensorIDs', (req, res) => {
     wearableSensorIDs.push (k);
   }
   res.send (JSON.stringify (wearableSensorIDs));
+});
+
+app.get ('/getIsInWC/:wearableSensorID', (req, res) => {
+  let wearableSensorID = req.params.wearableSensorID;
+  res.send (JSON.stringify (wearableSensors[wearableSensorID].inWC));
+
 });
 
 app.get ('/getWear', (req, res) => {
