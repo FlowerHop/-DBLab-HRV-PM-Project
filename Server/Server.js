@@ -146,6 +146,7 @@ wss.on('connection', function (ws) {
         // console.log (message);
         var moveInWC = message.moveInWC;
         if (message.wearableSensorID) {
+          console.log(message);
           var wearableSensorID = message.wearableSensorID;
           var hr = message.hr;
           var rssi = message.rssi;
