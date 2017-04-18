@@ -143,11 +143,11 @@ wss.on ('connection', (ws) => {
       ws.on ('message', (message) => {
         message = JSON.parse (message);
         console.log (message);
+        let moveInWC = message.moveInWC;
         if (message.wearableSensorID) {
           let wearableSensorID = message.wearableSensorID;
           let hr = message.hr;
           let rssi = message.rssi;
-          let moveInWC = message.moveInWC;
 
           if (wearableSensors[wearableSensorID]) {
             room.scanMove (moveInWC);

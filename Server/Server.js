@@ -144,14 +144,14 @@ wss.on('connection', function (ws) {
       ws.on('message', function (message) {
         message = JSON.parse(message);
         console.log(message);
+        var moveInWC = message.moveInWC;
         if (message.wearableSensorID) {
           var wearableSensorID = message.wearableSensorID;
           var hr = message.hr;
           var rssi = message.rssi;
-          var _moveInWC = message.moveInWC;
 
           if (wearableSensors[wearableSensorID]) {
-            room.scanMove(_moveInWC);
+            room.scanMove(moveInWC);
             if (room.scan(wearableSensors[wearableSensorID], rssi)) {
               wearableSensors[wearableSensorID].patient.inputHR(pulse);
             }

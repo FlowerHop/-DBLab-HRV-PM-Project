@@ -22,11 +22,6 @@ let isStart = false;
 RPIO.open (11, RPIO.INPUT);
 let isThere = false;
 
-setInterval (() => {
-  isThere = RPIO.read (11);
-  ws.send (JSON.stringify ({moveInWC: isThere}));
-}, 20);
-
 let ws = new WebSocket (serverURL, { perMessageDeflate: false });
 
 const serialport = new SerialPort (COM_NUM, {
@@ -78,6 +73,11 @@ function handleInit (message) {
   if (message == 'ok') {
   	ws.removeEventListener ('message', handleInit);
     ws.on ('message', atMode);
+    
+    setInterval (() => {
+      isThere = RPIO.read (11);
+      ws.send (JSON.stringify ({moveInWC: isThere}));
+    }, 20);
   }
 }
 
