@@ -25,7 +25,7 @@ ws = new WebSocket('ws://140.115.51.30:1338', {
 
 ws.on('open', function () {
   console.log('connection');
-  ws.send('id/' + id);
+  ws.send('stationarySensorID/' + id);
 });
 
 ws.on('message', handleInit);

@@ -20,19 +20,19 @@ class Home extends Component {
             <form className="form-horizontal" role="form">
               <h2 className="col-md-offset-2">新增病人資料</h2>
               <div className="form-group">
-                <label for="inputEmail3" className="col-md-2 control-label">病人ID</label>
+                <label htmlFor="inputEmail3" className="col-md-2 control-label">病人ID</label>
                 <div className="col-md-8">
                   <input type="text" className="form-control" id="inputEmail3" placeholder="輸入病人ID"/>
                 </div>
               </div>
               <div className="form-group">
-                <label for="inputPassword3" className="col-md-2 control-label">姓名</label>
+                <label htmlFor="inputPassword3" className="col-md-2 control-label">姓名</label>
                 <div className="col-md-8">
                   <input type="text" className="form-control" id="inputPassword3" placeholder="輸入姓名"/>
                 </div>
               </div>
               <div className="form-group">
-                <label for="inputPassword3" className="col-md-2 control-label">年齡</label>
+                <label htmlFor="inputPassword3" className="col-md-2 control-label">年齡</label>
                 <div className="col-md-8">
                   <select className="form-control" id="inputPassword3" placeholder="輸入年齡">
                     <option>20</option>
