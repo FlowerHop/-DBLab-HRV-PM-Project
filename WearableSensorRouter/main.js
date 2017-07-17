@@ -2,11 +2,11 @@
 
 var SerialPort = require('serialport');
 var WebSocket = require('ws');
-var RPIO = require('rpio');
+// var RPIO = require('rpio');
 var xbee_api = require('xbee-api');
 var C = xbee_api.constants;
-// const COM_NUM = "/dev/cu.usbserial-A403MPU4"; // mac usb
-var COM_NUM = "/dev/ttyUSB0"; // Linux usb
+const COM_NUM = "/dev/cu.usbserial-A70236OY"; // mac usb
+// var COM_NUM = "/dev/ttyUSB0"; // Linux usb
 var BAUDRATE = 9600;
 
 var xbeeAPI = new xbee_api.XBeeAPI({
@@ -19,7 +19,7 @@ var serverURL = "ws://140.115.51.30:1338";
 var IN_PLACE = process.argv[2];
 var isStart = false;
 
-RPIO.open(11, RPIO.INPUT);
+// RPIO.open(11, RPIO.INPUT);
 var isThere = false;
 
 var ws = new WebSocket(serverURL, { perMessageDeflate: false });
@@ -75,7 +75,7 @@ function handleInit(message) {
     ws.on('message', atMode);
 
     setInterval(function () {
-      isThere = RPIO.read(11);
+      // isThere = RPIO.read(11);
       ws.send(JSON.stringify({ moveInWC: isThere }));
     }, 20);
   }
