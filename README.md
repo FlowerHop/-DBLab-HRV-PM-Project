@@ -38,6 +38,24 @@ This is a patient monitoring system for 2 scenarios in medical environments, hos
 +   Used tools and libraries: [firebase](https://firebase.google.com/) (for database), gulp, babel and express
 +   Start command (in Server folder): node Server.js
 +   Note: HRVlib is refer to [Alive source code](https://www.dropbox.com/sh/ce0qy649p3xk9wt/AAASRd7Tc0gFrfXeZDkYUnhla?dl=0). I transformed it to Javascript and use them to detect R peak then do HRV analysis. It can real-time analyze the last 32 RR intervals to calculate HRV paramters.
++    RESTFul API:  
+GET: /getPatientsAtRoom/{roomID}  
+GET: /getRoomIDs  
+GET: /getWearableSensorIDs  
+GET: /getIsInWC/{wearableSensorID}  
+GET: /getWear  
+POST: /updateWear  
+GET: /getStationarySensorStatus/{stationarySensorID}  
+GET: /updateStationarySensorStatus/{stationarySensorID}/{status}  
+GET: /getParameters/{patientID}  
+GET: /getStatus/{patientID}  
+GET: /getHR/{patientID}  
+GET: /getRawECGSamples/{patientID}  
+POST: /newStationarySensor/  
+POST: /updateMonitor/  
+GET: /getStationarySensorIDs  
+GET: /getPatientIDs  
+GET: /getPatient/{patientID}  
 
 ## Web App (in Server/public/app)
 +   Environment: Nodejs on Linux
